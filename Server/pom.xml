@@ -15,7 +15,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.messenger.server.Main</mainClass>
+                            <mainClass>com.messenger.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,10 +1,10 @@
 package com.messenger.server;
 
-import com.messenger.server.protocol.Message;
-import com.messenger.server.protocol.User;
-import com.messenger.server.protocol.request.*;
-import com.messenger.server.protocol.response.*;
-import com.messenger.server.xml.Xml;
+import com.messenger.protocol.Message;
+import com.messenger.protocol.User;
+import com.messenger.protocol.request.*;
+import com.messenger.protocol.response.*;
+import com.messenger.xml.Xml;
 
 import javax.xml.bind.JAXBException;
 import java.io.Closeable;

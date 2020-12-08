@@ -1,14 +1,12 @@
 package com.messenger.server;
 
-import com.messenger.server.protocol.User;
+import com.messenger.protocol.User;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Server extends Thread implements Closeable {

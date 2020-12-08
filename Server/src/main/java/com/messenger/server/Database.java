@@ -1,8 +1,8 @@
 package com.messenger.server;
 
-import com.messenger.server.protocol.Chat;
-import com.messenger.server.protocol.Message;
-import com.messenger.server.protocol.User;
+import com.messenger.protocol.Message;
+import com.messenger.protocol.User;
+import com.messenger.protocol.Chat;
 import org.sqlite.JDBC;
 
 import java.sql.*;
