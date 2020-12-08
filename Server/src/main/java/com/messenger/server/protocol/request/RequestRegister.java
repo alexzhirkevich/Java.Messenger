@@ -17,7 +17,7 @@ public class RequestRegister extends Request {
 	@XmlElement
 	private String passHash;
 
-	public RequestRegister()  {
+	private RequestRegister()  {
 		super(REQ_REGISTER);
 	}
 
@@ -29,11 +29,11 @@ public class RequestRegister extends Request {
 
 	@XmlTransient
 	public User getUser() {
-		return user;
+		return user != null ? new User(user):null;
 	}
 
 	public void setUser(User user) {
-		this.user = user;
+		this.user =  user != null ? new User(user):null ;
 	}
 
 	@XmlTransient

@@ -1,6 +1,5 @@
 package com.messenger.server.protocol.request;
 
-
 import com.messenger.server.protocol.Message;
 import com.messenger.server.protocol.User;
 
@@ -9,29 +8,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
-public class RequestMessage extends Request {
+public class RequestSendMessage extends Request {
 
 	private static final long serialVersionUID = 1L;
+
 
 	@XmlElement
 	private Message message;
 
-	public RequestMessage() {
-		super(REQ_MESSAGE);
+	private RequestSendMessage() {
+		super(REQ_SENDMSG);
 	}
 
-	public RequestMessage(Message message) {
-		super(REQ_MESSAGE);
-		setMessage(message);
+	public RequestSendMessage(Message message) {
+		super(REQ_SENDMSG);
 	}
 
 	@XmlTransient
 	public Message getMessage() {
-		return message;
+		return message != null ? new Message(message) : null;
 	}
 
 	public void setMessage(Message message) {
-		this.message = new Message(message);
+		this.message = message != null ? new Message(message) : null;
 	}
 }
+
 

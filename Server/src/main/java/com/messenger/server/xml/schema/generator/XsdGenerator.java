@@ -2,13 +2,8 @@ package com.messenger.server.xml.schema.generator;
 
 
 import com.messenger.server.protocol.Config;
-import com.messenger.server.protocol.request.RequestLogin;
-import com.messenger.server.protocol.request.RequestMessage;
-import com.messenger.server.protocol.request.RequestRegister;
-import com.messenger.server.protocol.response.ResponseInvalid;
-import com.messenger.server.protocol.response.ResponseLogin;
-import com.messenger.server.protocol.response.ResponseMessage;
-import com.messenger.server.protocol.response.ResponseRegister;
+import com.messenger.server.protocol.request.*;
+import com.messenger.server.protocol.response.*;
 import com.messenger.server.xml.Xml;
 
 import javax.xml.bind.JAXBContext;
@@ -25,6 +20,7 @@ public abstract class XsdGenerator {
 
 	public static void generateAll() throws JAXBException, IOException {
 		XsdGenerator.create(ResponseInvalid.class.getSimpleName(), ResponseInvalid.class);
+		XsdGenerator.create(RequestDisconnect.class.getSimpleName(), RequestDisconnect.class);
 
 		XsdGenerator.create(RequestRegister.class.getSimpleName(), RequestRegister.class);
 		XsdGenerator.create(ResponseRegister.class.getSimpleName(), ResponseRegister.class);
@@ -32,8 +28,11 @@ public abstract class XsdGenerator {
 		XsdGenerator.create(RequestLogin.class.getSimpleName(), RequestLogin.class);
 		XsdGenerator.create(ResponseLogin.class.getSimpleName(), ResponseLogin.class);
 
-		XsdGenerator.create(RequestMessage.class.getSimpleName(), RequestMessage.class);
-		XsdGenerator.create(ResponseMessage.class.getSimpleName(), ResponseMessage.class);
+		XsdGenerator.create(RequestChat.class.getSimpleName(), RequestChat.class);
+		XsdGenerator.create(ResponseChat.class.getSimpleName(), ResponseChat.class);
+
+		XsdGenerator.create(RequestSendMessage.class.getSimpleName(), RequestSendMessage.class);
+		XsdGenerator.create(ResponseSendMessage.class.getSimpleName(), ResponseSendMessage.class);
 	}
 
 

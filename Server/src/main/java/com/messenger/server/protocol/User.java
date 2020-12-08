@@ -1,12 +1,17 @@
 package com.messenger.server.protocol;
 
+import javax.swing.*;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.Serializable;
+import java.util.Objects;
 
 @XmlRootElement
-public class User {
+public class User implements Serializable {
+
+	private static final long SerialVersionUID = 1L;
 
 	@XmlAttribute
 	int id;
@@ -69,5 +74,16 @@ public class User {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		User user = (User) o;
+		return id == user.id &&
+				Objects.equals(firstName, user.firstName) &&
+				Objects.equals(lastName, user.lastName) &&
+				Objects.equals(phone, user.phone);
 	}
 }

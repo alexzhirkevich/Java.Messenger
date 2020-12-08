@@ -1,5 +1,7 @@
 package com.messenger.server.protocol;
 
+import com.messenger.server.xml.Xml;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -12,7 +14,7 @@ import java.util.Locale;
 
 
 @XmlRootElement
-public class Message implements Serializable {
+public class Message extends Xml implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,6 +33,9 @@ public class Message implements Serializable {
 	@XmlElement
 	Time time;
 
+	@XmlAttribute
+	int id;
+
 	private Message(){}
 
 	public Message(Message msg){
@@ -43,6 +48,7 @@ public class Message implements Serializable {
 		setText(text);
 		setDate(date);
 		setTime(time);
+		setId(-1);
 	}
 
 	@XmlTransient
@@ -88,5 +94,14 @@ public class Message implements Serializable {
 
 	public void setTime(Time time) {
 		this.time = new Time(time.getTime());
+	}
+
+	@XmlTransient
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

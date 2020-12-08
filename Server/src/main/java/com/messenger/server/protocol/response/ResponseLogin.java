@@ -16,13 +16,14 @@ public class ResponseLogin extends Response {
 
 	private ResponseLogin() { }
 
-	public ResponseLogin(byte id, byte userId) {
+	public ResponseLogin(byte id, int userId) {
 		super(Request.REQ_LOGIN, id);
 		setUserId(userId);
 	}
 
-	public ResponseLogin(byte id, String errorMsg) {
+	public ResponseLogin(byte id, int userId, String errorMsg) {
 		super(Request.REQ_LOGIN, id, errorMsg);
+		setUserId(userId);
 	}
 
 	@XmlTransient

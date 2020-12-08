@@ -16,7 +16,7 @@ public class RequestLogin extends Request {
 	@XmlElement
 	private String passHash;
 
-	public RequestLogin() {
+	private RequestLogin() {
 		super(REQ_LOGIN);
 	}
 

@@ -1,13 +1,8 @@
 package com.messenger.server.xml;
 
 import com.messenger.server.protocol.Config;
-import com.messenger.server.protocol.request.Request;
-import com.messenger.server.protocol.request.RequestLogin;
-import com.messenger.server.protocol.request.RequestRegister;
-import com.messenger.server.protocol.response.Response;
-import com.messenger.server.protocol.response.ResponseInvalid;
-import com.messenger.server.protocol.response.ResponseLogin;
-import com.messenger.server.protocol.response.ResponseRegister;
+import com.messenger.server.protocol.request.*;
+import com.messenger.server.protocol.response.*;
 import com.messenger.server.xml.schema.validator.InvalidSchemaException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,14 +68,24 @@ public abstract class Xml {
 				return RequestLogin.class;
 			else if (name.equals(RequestRegister.class.getSimpleName()))
 				return RequestRegister.class;
+			else if (name.equals(RequestChat.class.getSimpleName()))
+				return RequestChat.class;
+			else if (name.equals(RequestSendMessage.class.getSimpleName()))
+				return RequestSendMessage.class;
+
+			else if (name.equals(RequestDisconnect.class.getSimpleName()))
+				return RequestDisconnect.class;
 		} else if (name.contains(Response.class.getSimpleName())) {
 			if (name.equals(ResponseInvalid.class.getSimpleName()))
 				return ResponseInvalid.class;
 			else if (name.equals(ResponseLogin.class.getSimpleName()))
 				return ResponseLogin.class;
 			else if (name.equals(ResponseRegister.class.getSimpleName()))
-				return Response.class;
-
+				return ResponseRegister.class;
+			else if (name.equals(ResponseChat.class.getSimpleName()))
+				return ResponseChat.class;
+			else if (name.equals(ResponseSendMessage.class.getSimpleName()))
+				return ResponseSendMessage.class;
 		}
 
 		return null;

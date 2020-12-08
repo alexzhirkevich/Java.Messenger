@@ -1,47 +1,40 @@
 package com.messenger.server;
 
+import com.messenger.server.protocol.Message;
 import com.messenger.server.protocol.User;
-import com.messenger.server.protocol.request.Request;
-import com.messenger.server.protocol.request.RequestDisconnect;
-import com.messenger.server.protocol.request.RequestLogin;
-import com.messenger.server.protocol.request.RequestRegister;
-import com.messenger.server.protocol.response.Response;
-import com.messenger.server.protocol.response.ResponseInvalid;
-import com.messenger.server.protocol.response.ResponseRegister;
-import com.messenger.server.protocol.response.Responser;
+import com.messenger.server.protocol.request.*;
+import com.messenger.server.protocol.response.*;
 import com.messenger.server.xml.Xml;
 
 import javax.xml.bind.JAXBException;
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.sql.SQLException;
 
-public class Session extends Thread {
+public class Session extends Thread implements Closeable {
 
 	private final Server server;
 	private final Socket socket;
-	private final long id;
-	private final User user;
+	private User user = null;
 	private final DataInputStream dataInputStream;
 	private final DataOutputStream dataOutputStream;
 
-	private boolean connected = false;
 	private boolean isRunning = false;
 
-	public Session(Server server, Socket socket, int id, User user) throws IOException {
+	public Session(Server server, Socket socket) throws IOException {
 		this.server = server;
 		this.socket = socket;
-		this.id = id;
-		this.user = new User(user);
 		this.socket.setSoTimeout(500);
 		this.dataInputStream = new DataInputStream(socket.getInputStream());
 		this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
 	}
 
 	public void sendResponse(Response req) throws JAXBException, IOException {
-		dataOutputStream.writeUTF(Xml.toXml(req));
+		if (req != null)
+			dataOutputStream.writeUTF(Xml.toXml(req));
 	}
 
 	private Request getRequest() {
@@ -63,8 +56,13 @@ public class Session extends Thread {
 				return login((RequestLogin) req);
 			case Request.REQ_REGISTER:
 				return register((RequestRegister) req);
+			case Request.REQ_CHAT:
+				return chat((RequestChat)req);
+			case Request.REQ_SENDMSG:
+				return sendMsg((RequestSendMessage)req);
 			case Request.REQ_DISCONNECT:
 				disconnect((RequestDisconnect) req);
+				return null;
 		}
 
 		return null;
@@ -78,8 +76,7 @@ public class Session extends Thread {
 			if (req == null) {
 				try {
 					sendResponse(new ResponseInvalid("Invalid Request"));
-				} catch (Exception ingore) {
-				}
+				} catch (Exception ingore) { }
 			}
 
 			try {
@@ -87,29 +84,122 @@ public class Session extends Thread {
 			} catch (Exception e) {
 				try {
 					sendResponse(new ResponseInvalid("404 not found"));
-				} catch (Exception ignore) {
-				}
+				} catch (Exception ignore) { }
 			}
 		}
 	}
 
-	private Response login(RequestLogin req) {
-		return null;
+	private boolean send(Message msg){
+		try{
+			if (!server.database.userExists(msg.getFromUser().getPhone()))
+				return false;
+			if (!server.database.userExists(msg.getToUser().getPhone()))
+				return false;
+			if (msg.getText() == null)
+				return false;
+
+			DataOutputStream out = server.getUserOutputStream(msg.getToUser());
+			out.writeUTF(Xml.toXml(new Message(msg)));
+			return true;
+
+		}catch (Exception e){
+			return false;
+		}
 	}
 
-	private Response register(RequestRegister req) {
+	private ResponseSendMessage sendMsg(RequestSendMessage req) {
+		try{
+
+			if (user == null || !user.equals(req.getMessage().getFromUser()))
+				return new ResponseSendMessage(Responser.RES_NOTAUTHORIZED,"Not authorised");
+			if (!server.database.userExists(req.getMessage().getFromUser().getPhone()))
+				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,"FromUser doesn't exists");
+			if (!server.database.userExists(req.getMessage().getToUser().getPhone()))
+				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,"ToUser doesn't exists");
+
+			server.database.addMessage(req.getMessage());
+			if (send(req.getMessage()))
+				return new ResponseSendMessage(Responser.RES_OK);
+			else
+				return new ResponseSendMessage(Responser.RES_ERROR,"Error");
+		}catch (SQLException e){
+			return new ResponseSendMessage(Responser.RES_ERROR,"Error");
+		}
+	}
+
+
+	private ResponseChat chat(RequestChat req) {
 		try {
+
+			if (user == null || !user.equals(req.getRequester()))
+				return new ResponseChat(Responser.RES_NOTAUTHORIZED, null, "Not authorised");
+
+			if (!server.database.userExists(req.getRequester().getPhone()))
+				return new ResponseChat(Response.RES_USERNOTEXISTS, null, "Requested user1 doesn't exist");
+			if (!server.database.userExists(req.getRequester().getPhone()))
+				return new ResponseChat(Response.RES_USERNOTEXISTS, null, "Requested user2 doesn't exist");
+
+			return new ResponseChat(Response.RES_OK, server.database.getChat(req.getRequester(),req.getWithUser()));
+		}
+		catch (SQLException e) {
+			return new ResponseChat(Response.RES_ERROR, null, "Chats error");
+		}
+	}
+
+	private ResponseLogin login(RequestLogin req) {
+		try {
+			if (!server.database.userExists(req.getPhone()))
+				return new ResponseLogin(Response.RES_NOTAUTHORIZED, -1,"User is not registered");
+			if (!server.database.passCorrect(req.getPhone(),req.getPassHash()))
+				return new ResponseLogin(Response.RES_WRONGPASSWORD,-1,"Incorrect password");
+
+			int id = server.database.getUserId(req.getPhone());
+			user = server.database.getUser(id);
+
+			return new ResponseLogin(Response.RES_OK,id);
+		} catch (SQLException e){
+			return  new ResponseLogin(Response.RES_ERROR,-1, "Login error");
+		}
+	}
+
+	private ResponseRegister register(RequestRegister req) {
+		try {
+			if (server.database.userExists(req.getUser().getPhone()))
+				return new ResponseRegister(Response.RES_USEREXISTS, -1, "User is already exists");
 			server.database.addUser(
 					req.getUser().getFirstName(),
 					req.getUser().getLastName(),
 					req.getUser().getPhone(), req.getPassHash());
-			return new ResponseRegister(Responser.RES_OK);
+			int userID = server.database.getUserId(req.getUser().getPhone());
+			return new ResponseRegister(Response.RES_OK, userID);
 		} catch (SQLException e) {
-			return new ResponseRegister(Responser.RES_ERROR, "Register fail");
+			return new ResponseRegister(Response.RES_ERROR, -1,"Register fail");
 		}
 	}
 
-	private Response disconnect(RequestDisconnect req) {
-		return null;
+	private void disconnect(RequestDisconnect req) {
+		if (user != null && user.equals(req.getUser()))
+			close();
+	}
+
+	protected User getUser() {
+		return new User(user);
+	}
+
+	public DataOutputStream getOutputStream(){
+		return dataOutputStream;
+	}
+
+	@Override
+	public void close() {
+		try {
+			isRunning = false;
+			server.endSession(this);
+			dataInputStream.close();
+			dataOutputStream.close();
+			socket.close();
+		} catch (Exception e){}
+
+		interrupt();
 	}
 }
