@@ -3,19 +3,18 @@ package com.messenger.protocol.request;
 
 import com.messenger.protocol.User;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class RequestChat extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private User requester;
 
-	@XmlElement
+	@Element
 	private User withUser;
 
 	private RequestChat() {
@@ -28,7 +27,6 @@ public class RequestChat extends Request {
 		setWithUser(withUser);
 	}
 
-	@XmlTransient
 	public User getRequester() {
 		return requester != null ? new User(requester) : null;
 	}
@@ -37,7 +35,6 @@ public class RequestChat extends Request {
 		this.requester = user!=null ? new User(user) : null;
 	}
 
-	@XmlTransient
 	public User getWithUser() {
 		return withUser = withUser !=null ? new User(withUser):null;
 	}

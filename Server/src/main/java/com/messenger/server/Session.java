@@ -7,10 +7,7 @@ import com.messenger.protocol.response.*;
 import com.messenger.xml.Xml;
 
 import javax.xml.bind.JAXBException;
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
 
@@ -19,33 +16,22 @@ public class Session extends Thread implements Closeable {
 	private final Server server;
 	private final Socket socket;
 	private User user = null;
-	private final DataInputStream dataInputStream;
-	private final DataOutputStream dataOutputStream;
+	private DataInputStream dataInputStream;
+	private DataOutputStream dataOutputStream;
 
 	private boolean isRunning = false;
 
 	public Session(Server server, Socket socket) throws IOException {
 		this.server = server;
 		this.socket = socket;
-		this.socket.setSoTimeout(500);
-		this.dataInputStream = new DataInputStream(socket.getInputStream());
-		this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+		this.socket.setSoTimeout(5000);
 	}
 
-	public void sendResponse(Response req) throws JAXBException, IOException {
+	public void sendResponse(Response req) throws Exception {
 		if (req != null)
 			dataOutputStream.writeUTF(Xml.toXml(req));
 	}
 
-	private Request getRequest() {
-		Request req;
-		try {
-			req = (Request) Xml.fromXml(dataInputStream.readUTF());
-			return req;
-		} catch (Exception e) {
-			return null;
-		}
-	}
 
 	private Response processRequest(Request req) {
 		if (req == null)
@@ -59,7 +45,7 @@ public class Session extends Thread implements Closeable {
 			case Request.REQ_CHAT:
 				return chat((RequestChat)req);
 			case Request.REQ_SENDMSG:
-				return sendMsg((RequestSendMessage)req);
+				return message((RequestSendMessage)req);
 			case Request.REQ_DISCONNECT:
 				disconnect((RequestDisconnect) req);
 				return null;
@@ -70,23 +56,29 @@ public class Session extends Thread implements Closeable {
 
 	@Override
 	public void run() {
-		isRunning = true;
-		while (isRunning) {
-			Request req = getRequest();
-			if (req == null) {
-				try {
-					sendResponse(new ResponseInvalid("Invalid Request"));
-				} catch (Exception ingore) { }
-			}
+		try {
+			this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+			dataOutputStream.flush();
+			this.dataInputStream = new DataInputStream(socket.getInputStream());
+		}catch (Exception ignore){}
 
-			try {
-				sendResponse(processRequest(req));
-			} catch (Exception e) {
+			isRunning = true;
+			while (isRunning) {
+				Request req = null;
 				try {
-					sendResponse(new ResponseInvalid("404 not found"));
-				} catch (Exception ignore) { }
+					req = (Request) Xml.fromXml(dataInputStream.readUTF());
+				} catch (Exception ignore){
+					continue;
+				}
+
+				try {
+					sendResponse(processRequest(req));
+				} catch (Exception e) {
+					try {
+						sendResponse(new ResponseInvalid("404 not found"));
+					} catch (Exception ignore) { }
+				}
 			}
-		}
 	}
 
 	private boolean send(Message msg){
@@ -99,7 +91,7 @@ public class Session extends Thread implements Closeable {
 				return false;
 
 			DataOutputStream out = server.getUserOutputStream(msg.getToUser());
-			out.writeUTF(Xml.toXml(new Message(msg)));
+			out.writeUTF(Xml.toXml(msg));
 			return true;
 
 		}catch (Exception e){
@@ -107,26 +99,34 @@ public class Session extends Thread implements Closeable {
 		}
 	}
 
-	private ResponseSendMessage sendMsg(RequestSendMessage req) {
+	private ResponseSendMessage message(RequestSendMessage req) {
 		try{
 
 			if (user == null || !user.equals(req.getMessage().getFromUser()))
-				return new ResponseSendMessage(Responser.RES_NOTAUTHORIZED,"Not authorised");
+				return new ResponseSendMessage(Responser.RES_NOTAUTHORIZED,-1,"Not authorised");
 			if (!server.database.userExists(req.getMessage().getFromUser().getPhone()))
-				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,"FromUser doesn't exists");
+				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,-1,"FromUser doesn't exists");
 			if (!server.database.userExists(req.getMessage().getToUser().getPhone()))
-				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,"ToUser doesn't exists");
+				return new ResponseSendMessage(Responser.RES_USERNOTEXISTS,-1,"ToUser doesn't exists");
 
-			server.database.addMessage(req.getMessage());
-			if (send(req.getMessage()))
-				return new ResponseSendMessage(Responser.RES_OK);
+			int msgId  = server.database.addMessage(req.getMessage());
+
+			Message msg = req.getMessage();
+			if (msg.getFromUser().getId() == -1)
+				msg.setFromUserId(server.database.getUserId(msg.getFromUser().getPhone()));
+			if (msg.getToUser().getId() == -1)
+				msg.setToUserId(server.database.getUserId(msg.getToUser().getPhone()));
+
+			msg.setId(msgId);
+
+			if (send(msg))
+				return new ResponseSendMessage(Responser.RES_OK,msgId);
 			else
-				return new ResponseSendMessage(Responser.RES_ERROR,"Error");
+				return new ResponseSendMessage(Responser.RES_ERROR,-1,"Error");
 		}catch (SQLException e){
-			return new ResponseSendMessage(Responser.RES_ERROR,"Error");
+			return new ResponseSendMessage(Responser.RES_ERROR,-1, "Error");
 		}
 	}
-
 
 	private ResponseChat chat(RequestChat req) {
 		try {
@@ -155,6 +155,8 @@ public class Session extends Thread implements Closeable {
 
 			int id = server.database.getUserId(req.getPhone());
 			user = server.database.getUser(id);
+
+			System.out.println("User logged in: " + user.getPhone());
 
 			return new ResponseLogin(Response.RES_OK,id);
 		} catch (SQLException e){

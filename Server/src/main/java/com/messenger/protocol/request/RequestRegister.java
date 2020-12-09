@@ -2,19 +2,18 @@ package com.messenger.protocol.request;
 
 import com.messenger.protocol.User;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class RequestRegister extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private User user;
 
-	@XmlElement
+	@Element
 	private String passHash;
 
 	private RequestRegister()  {
@@ -27,7 +26,6 @@ public class RequestRegister extends Request {
 		setPassHash(passHash);
 	}
 
-	@XmlTransient
 	public User getUser() {
 		return user != null ? new User(user):null;
 	}
@@ -36,7 +34,6 @@ public class RequestRegister extends Request {
 		this.user =  user != null ? new User(user):null ;
 	}
 
-	@XmlTransient
 	public String getPassHash() {
 		return passHash;
 	}

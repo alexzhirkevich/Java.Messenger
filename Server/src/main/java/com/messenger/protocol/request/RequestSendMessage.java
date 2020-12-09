@@ -2,17 +2,15 @@ package com.messenger.protocol.request;
 
 import com.messenger.protocol.Message;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class RequestSendMessage extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-
-	@XmlElement
+	@Element
 	private Message message;
 
 	private RequestSendMessage() {
@@ -23,7 +21,6 @@ public class RequestSendMessage extends Request {
 		super(REQ_SENDMSG);
 	}
 
-	@XmlTransient
 	public Message getMessage() {
 		return message != null ? new Message(message) : null;
 	}

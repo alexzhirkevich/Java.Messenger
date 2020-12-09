@@ -2,9 +2,9 @@ package com.messenger.protocol.response;
 
 import com.messenger.protocol.request.Request;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class ResponseInvalid extends Response{
 
 	public ResponseInvalid(){

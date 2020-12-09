@@ -7,8 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Time;
+import java.sql.Date;
 
 
 @XmlRootElement
@@ -47,6 +47,11 @@ public class Message extends Xml implements Serializable {
 		setDate(date);
 		setTime(time);
 		setId(-1);
+	}
+
+	public Message(User fromUser, User toUser, String text, Date date, Time time, int id){
+		this(fromUser,toUser,text,date,time);
+		setId(id);
 	}
 
 	@XmlTransient
@@ -101,5 +106,13 @@ public class Message extends Xml implements Serializable {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setFromUserId(int id){
+		fromUser.setId(id);
+	}
+
+	public void setToUserId(int id){
+		toUser.setId(id);
 	}
 }

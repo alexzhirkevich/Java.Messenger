@@ -2,16 +2,15 @@ package com.messenger.protocol.response;
 
 import com.messenger.protocol.request.Request;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class ResponseLogin extends Response {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private long userId;
 
 	private ResponseLogin() { }
@@ -26,7 +25,6 @@ public class ResponseLogin extends Response {
 		setUserId(userId);
 	}
 
-	@XmlTransient
 	public long getUserId() {
 		return userId;
 	}

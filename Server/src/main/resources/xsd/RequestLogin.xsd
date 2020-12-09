@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:element name="requestLogin" type="requestLogin"/>
+  <xs:element name="requestLogin" type="requestLogin"/>
 
-    <xs:complexType name="requestLogin">
-        <xs:sequence>
-            <xs:element name="phone" type="xs:string" minOccurs="0"/>
-            <xs:element name="passHash" type="xs:string" minOccurs="0"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="xs:byte" use="required"/>
-    </xs:complexType>
+  <xs:complexType name="requestLogin">
+    <xs:sequence>
+      <xs:element name="phone" type="xs:string" minOccurs="0"/>
+      <xs:element name="passHash" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:byte" use="required"/>
+  </xs:complexType>
 </xs:schema>
 

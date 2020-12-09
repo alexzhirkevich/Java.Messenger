@@ -1,28 +1,27 @@
 package com.messenger.protocol.request;
 
 import com.messenger.xml.Xml;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Transient;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 
-@XmlTransient
+@Transient
 public abstract class Request extends Xml implements Requester, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute
+	@Attribute
 	protected byte id;
 
 	protected Request() {
 		this(REQ_INVALID);
 	}
 
-	public Request(byte id){
+	public Request(@Attribute(name = "id") byte id){
 		this.id = id;
 	}
 
-	@XmlTransient
 	public byte getId() {
 		return id;
 	}

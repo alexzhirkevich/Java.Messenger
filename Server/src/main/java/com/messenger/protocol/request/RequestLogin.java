@@ -1,19 +1,18 @@
 package com.messenger.protocol.request;
 
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class RequestLogin extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private String phone;
 
-	@XmlElement
+	@Element
 	private String passHash;
 
 	private RequestLogin() {
@@ -26,7 +25,6 @@ public class RequestLogin extends Request {
 		setPassHash(passHash);
 	}
 
-	@XmlTransient
 	public String getPhone() {
 		return phone;
 	}
@@ -35,7 +33,6 @@ public class RequestLogin extends Request {
 		this.phone = phone;
 	}
 
-	@XmlTransient
 	public String getPassHash() {
 		return passHash;
 	}

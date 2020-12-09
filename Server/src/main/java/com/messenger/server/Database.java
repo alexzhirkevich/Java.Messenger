@@ -6,6 +6,7 @@ import com.messenger.protocol.Chat;
 import org.sqlite.JDBC;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
@@ -48,7 +49,7 @@ public class Database implements AutoCloseable {
 	public User getUser(int id) throws SQLException {
 		if (!userExists(id))
 			return null;
-		ResultSet rs = statement.executeQuery(String.format("SELECT * FROM users WHERE id IS ('%d')",id));
+		ResultSet rs = statement.executeQuery(String.format("SELECT * FROM users WHERE user_id IS ('%d')",id));
 		return new User(rs.getString("first_name"), rs.getString("last_name"), rs.getString("phone"));
 	}
 
@@ -62,13 +63,14 @@ public class Database implements AutoCloseable {
 	public int getUserId(String phone) throws SQLException {
 		if (!userExists(phone))
 			return -1;
-		ResultSet rs = statement.executeQuery(String.format("SELECT user_id FROM users WHERE phone IS ('%s')",phone));
-		return rs.getInt("user_id");
+		try (ResultSet rs = statement.executeQuery(String.format("SELECT user_id FROM users WHERE phone IS ('%s')",phone))) {
+			return rs.getInt("user_id");
+		}
 	}
 
-	public boolean addMessage(Message message) throws SQLException {
+	public int addMessage(Message message) throws SQLException {
 		if (message.getText().length() > 1000 || !userExists(message.getFromUser().getId()) || !userExists(message.getToUser().getId())) {
-			return false;
+			return -1;
 		}
 
 		int from_id = message.getFromUser().getId();
@@ -79,11 +81,23 @@ public class Database implements AutoCloseable {
 		if (to_id == -1)
 			to_id = getUserId(message.getToUser().getPhone());
 
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		String date = simpleDateFormat.format(message.getDate());
+		String time = message.getTime().toString() + message.getTime().toString();
+
 		statement.executeUpdate(String.format(
-				"INSERT INFO messages (from_user_id, to_user_id, text) VALUES ('%s','%s','%s')",
-				from_id, to_id, message.getText())
+				"INSERT INFO messages (from_user_id, to_user_id, text, date, time) VALUES ('%d','%d','%s','%s','%s')",
+				from_id, to_id, message.getText(), date, time)
 		);
-		return true;
+
+		int msgId = -1;
+		try (ResultSet rs = statement.executeQuery(String.format(
+				"SELECT msg_id FROM messages WHERE from_user_id IS ('%d') AND to_user_id IS ('%s') ORDER BY msg_id DECS LIMIT 1",
+				from_id, to_id))) {
+			msgId = rs.getInt("msg_id");
+		}
+
+		return msgId;
 	}
 
 	public boolean deleteMessageByUser(Message msg, User user) throws SQLException {
@@ -120,21 +134,22 @@ public class Database implements AutoCloseable {
 
 		try (ResultSet rs = statement.executeQuery(String.format(
 				"SELECT * FROM messages WHERE from_user_id IS ('%d') AND to_user_id IS ('%d')", user1.getId(), user2.getId()))) {
-			Boolean[] to_deleted = (Boolean[])rs.getArray("to_deleted").getArray();
 			Boolean[] from_deleted = (Boolean[])rs.getArray("from_deleted").getArray();
+			Integer[] ids = (Integer[])rs.getArray("msg_id").getArray();
 			String[] text = (String[])rs.getArray("text").getArray();
 			Date[] date =  (Date[])rs.getArray("date").getArray();
 			Time[] time =  (Time[])rs.getArray("time").getArray();
 
 			for(int i =0;i<text.length;i++){
 				if (!from_deleted[i])
-					from1to2.add(new Message(user1,user2,text[i],date[i],time[i]));
+					from1to2.add(new Message(user1,user2,text[i],date[i],time[i],ids[i]));
 			}
 		}
 		try (ResultSet rs = statement.executeQuery(String.format(
-				"SELECT * FROM messages WHERE from_user_id IS ('%d') AND to_user_id IS ('%d')", user2.getId(), user1.getId()))) {
+				"SELECT * FROM messages WHERE from_user_id IS ('%d') AND to_user_id IS ('%d')",
+				user2.getId(), user1.getId()))) {
 			Boolean[] to_deleted = (Boolean[])rs.getArray("to_deleted").getArray();
-			Boolean[] from_deleted = (Boolean[])rs.getArray("from_deleted").getArray();
+			Integer[] ids = (Integer[])rs.getArray("msg_id").getArray();
 			String[] text = (String[])rs.getArray("text").getArray();
 			Date[] date =  (Date[])rs.getArray("date").getArray();
 			Time[] time =  (Time[])rs.getArray("time").getArray();
@@ -142,7 +157,7 @@ public class Database implements AutoCloseable {
 
 			for(int i =0;i<text.length;i++) {
 				if (!to_deleted[i])
-					from2to1.add(new Message(user2,user1,text[i],date[i],time[i]));
+					from2to1.add(new Message(user2,user1,text[i],date[i],time[i],ids[i]));
 			}
 		}
 
@@ -172,7 +187,9 @@ public class Database implements AutoCloseable {
 
 		ArrayList<Message> inMessages = new ArrayList<>();
 
-		try (ResultSet rs = statement.executeQuery(String.format("SELECT * FROM messages WHERE to_user_id IS ('%s')", user.getId()))) {
+		try (ResultSet rs = statement.executeQuery(String.format(
+				"SELECT * FROM messages WHERE to_user_id IS ('%s')",
+				user.getId()))) {
 
 			if (rs.isClosed())
 				return null;
@@ -201,7 +218,9 @@ public class Database implements AutoCloseable {
 
 		ArrayList<Message> outMessages = new ArrayList<>();
 
-		try (ResultSet rs = statement.executeQuery(String.format("SELECT * FROM messages WHERE from_user_id IS ('%s')", user.getId()))) {
+		try (ResultSet rs = statement.executeQuery(String.format(
+				"SELECT * FROM messages WHERE from_user_id IS ('%s')",
+				user.getId()))) {
 
 			if (rs.isClosed())
 				return null;

@@ -4,16 +4,15 @@ package com.messenger.protocol.response;
 import com.messenger.protocol.request.Request;
 import com.messenger.protocol.Chat;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class ResponseChat extends Response {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private Chat chat;
 
 	private ResponseChat() {}
@@ -28,7 +27,6 @@ public class ResponseChat extends Response {
 		setChat(chat);
 	}
 
-	@XmlTransient
 	public Chat getChat() {
 		return chat !=null ? new Chat(chat) : null;
 	}

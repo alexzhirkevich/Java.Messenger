@@ -5,19 +5,22 @@ import com.messenger.protocol.User;
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server extends Thread implements Closeable {
 
-	private int PORT;
-	private ArrayList<Session> sessions;
-	protected Database database;
+	private final int PORT;
+	private final ArrayList<Session> sessions;
+	protected final Database database;
 	private boolean isRunning;
 
-	public Server(int port){
+	public Server(int port,String dbName){
 		this.PORT = port;
+		this.database = new Database(dbName);
+		sessions = new ArrayList<>();
 	}
 
 	@Override
@@ -27,12 +30,16 @@ public class Server extends Thread implements Closeable {
 		try {
 			serverSocket = new ServerSocket(PORT);
 		}catch (Exception e){
+			e.printStackTrace();
 			return;
 		}
+
+		System.out.println("Server started on port: " + PORT);
 
 		while (isRunning){
 			try {
 				Socket con = serverSocket.accept();
+				System.out.println("Connected");
 				Session session = new Session(this, con);
 				sessions.add(session);
 				session.start();

@@ -1,62 +1,52 @@
 package com.messenger.xml;
 
-import com.messenger.protocol.Config;
-import com.messenger.protocol.request.*;
 import com.messenger.protocol.response.*;
-import com.messenger.server.protocol.request.*;
-import com.messenger.server.protocol.response.*;
-import com.messenger.xml.schema.validator.InvalidSchemaException;
+import com.messenger.protocol.request.*;
+
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlTransient;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import javax.xml.transform.stream.StreamSource;
 
-@XmlTransient
+import java.io.IOException;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+
 public abstract class Xml {
 
-	public static String toXml(Xml msg) throws JAXBException, IOException {
-		try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(Config.XML_BUFFER)) {
-			JAXBContext context = JAXBContext.newInstance(msg.getClass());
-			Marshaller m = context.createMarshaller();
-			m.marshal(msg, byteArrayOutputStream);
-			byteArrayOutputStream.flush();
-			return byteArrayOutputStream.toString();
-		}
+	public static String toXml(Xml msg) throws Exception {
+
+		Serializer s = new Persister();
+		StringWriter sw = new StringWriter();
+		s.write(msg,sw);
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +sw.getBuffer().toString();
 	}
 
 	public static Xml fromXml(String xmlData)
-			throws JAXBException, IOException, InvalidSchemaException {
+			throws Exception {
+		System.out.println(xmlData);
 		Class<? extends Xml> dataClass;
-		try {
-			dataClass = getClassByName(getRootElement(xmlData));
-		} catch (Exception e) {
-			throw new InvalidSchemaException("Invalid schema");
-		}
-		if (dataClass == null)
-			throw new InvalidSchemaException("Invalid schema");
+		dataClass = getClassByName(getRootElement(xmlData));
 
-		try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(xmlData.getBytes())) {
-			JAXBContext context = JAXBContext.newInstance(dataClass);
-			Unmarshaller u = context.createUnmarshaller();
-			return (Xml) u.unmarshal(byteArrayInputStream);
-		}
+		Serializer s = new Persister();
+		if (s.validate(dataClass,xmlData))
+			return s.read(dataClass,xmlData);
+		return null;
 	}
 
 	private static String getRootElement(String xmlData) throws IOException, SAXException, ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(xmlData);
+		Document doc = builder.parse(new InputSource(new StringReader(xmlData)));
 		Element root = doc.getDocumentElement();
 		return root.getTagName();
 	}

@@ -3,20 +3,23 @@ package com.messenger.protocol.response;
 import com.messenger.protocol.request.Request;
 import com.messenger.xml.Xml;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Transient;
+
 import java.io.Serializable;
 
-@XmlTransient
+@Transient
 public abstract class Response extends Xml implements Responser, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlAttribute
+	@Attribute
 	byte id;
-	@XmlAttribute
+
+	@Attribute
 	byte request;
-	@XmlAttribute
+
+	@Attribute
 	String errorMsg;
 
 	protected Response() {
@@ -34,17 +37,18 @@ public abstract class Response extends Xml implements Responser, Serializable {
 		this.errorMsg = errorMsg;
 	}
 
-	@XmlTransient
+	public boolean error(){
+		return id != RES_OK;
+	}
+
 	public byte getId() {
 		return id;
 	}
 
-	@XmlTransient
 	public byte getRequestId() {
 		return request;
 	}
 
-	@XmlTransient
 	public String getErrorMsg() {
 		return errorMsg;
 	}

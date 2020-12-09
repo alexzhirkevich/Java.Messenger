@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:element name="responseLogin" type="responseLogin"/>
+  <xs:element name="responseLogin" type="responseLogin"/>
 
-    <xs:complexType name="responseLogin">
-        <xs:sequence>
-            <xs:element name="sessionId" type="xs:long"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="xs:byte" use="required"/>
-        <xs:attribute name="request" type="xs:byte" use="required"/>
-        <xs:attribute name="errorMsg" type="xs:string"/>
-    </xs:complexType>
+  <xs:complexType name="responseLogin">
+    <xs:sequence>
+      <xs:element name="userId" type="xs:long"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:byte" use="required"/>
+    <xs:attribute name="request" type="xs:byte" use="required"/>
+    <xs:attribute name="errorMsg" type="xs:string"/>
+  </xs:complexType>
 </xs:schema>
 

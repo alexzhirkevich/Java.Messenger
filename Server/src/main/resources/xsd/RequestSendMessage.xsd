@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="message" type="message"/>
+
+  <xs:element name="requestSendMessage" type="requestSendMessage"/>
+
+  <xs:element name="user" type="user"/>
+
+  <xs:complexType name="requestSendMessage">
+    <xs:sequence>
+      <xs:element ref="message" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:byte" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="message">
+    <xs:sequence>
+      <xs:element name="fromUser" type="user" minOccurs="0"/>
+      <xs:element name="toUser" type="user" minOccurs="0"/>
+      <xs:element name="text" type="xs:string" minOccurs="0"/>
+      <xs:element name="date" type="date" minOccurs="0"/>
+      <xs:element name="time" type="time" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:int" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="user">
+    <xs:sequence/>
+    <xs:attribute name="id" type="xs:int" use="required"/>
+    <xs:attribute name="firstName" type="xs:string"/>
+    <xs:attribute name="lastName" type="xs:string"/>
+    <xs:attribute name="phone" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="date">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="time">
+    <xs:sequence/>
+  </xs:complexType>
+</xs:schema>
+

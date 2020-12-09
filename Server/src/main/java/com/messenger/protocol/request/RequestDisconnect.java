@@ -2,15 +2,15 @@ package com.messenger.protocol.request;
 
 import com.messenger.protocol.User;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
-@XmlRootElement
+@Root
 public class RequestDisconnect extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlElement
+	@Element
 	private User user;
 
 	private RequestDisconnect() throws RequestException {
