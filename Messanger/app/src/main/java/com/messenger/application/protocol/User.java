@@ -3,25 +3,28 @@ package com.messenger.application.protocol;
 
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 
+@Root
 public class User implements Serializable {
 
 	private static final long SerialVersionUID = 1L;
 
-	@Attribute
+	@Attribute(name = "id")
 	int id;
 
-	@Attribute
+	@Element(name = "firstName")
 	String firstName;
 
-	@Attribute
+	@Element(name = "lastName")
 	String lastName;
 
-	@Attribute
+	@Element(name = "phone")
 	String phone;
 
 	protected User() {
@@ -54,7 +57,6 @@ public class User implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-
 
 	public String getLastName() {
 		return lastName;

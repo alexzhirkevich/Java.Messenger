@@ -1,5 +1,7 @@
 package com.messenger.application.data;
 
+import androidx.annotation.StringRes;
+
 /**
  * A generic class that holds a result success w/ data or an error exception.
  */
@@ -15,7 +17,7 @@ public class Result<T> {
             return "Success[data=" + success.getData().toString() + "]";
         } else if (this instanceof Result.Error) {
             Result.Error error = (Result.Error) this;
-            return "Error[exception=" + error.getError().toString() + "]";
+            return "Error[code=" + error.error + "]";
         }
         return "";
     }
@@ -35,13 +37,15 @@ public class Result<T> {
 
     // Error sub-class
     public final static class Error extends Result {
-        private Exception error;
 
-        public Error(Exception error) {
+        @StringRes
+        private Integer error;
+
+        public Error( @StringRes Integer error) {
             this.error = error;
         }
 
-        public Exception getError() {
+        public Integer getError() {
             return this.error;
         }
     }

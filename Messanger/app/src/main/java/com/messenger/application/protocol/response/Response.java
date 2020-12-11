@@ -19,7 +19,7 @@ public abstract class Response extends Xml implements Responser, Serializable {
 	@Attribute
 	byte request;
 
-	@Attribute
+	@Attribute(required = false)
 	String errorMsg;
 
 	protected Response() {
@@ -27,7 +27,7 @@ public abstract class Response extends Xml implements Responser, Serializable {
 		this.request = Request.REQ_INVALID;
 	}
 
-	public Response(byte req, byte id) {
+	public Response(@Attribute(name = "request")byte req, @Attribute(name = "id")byte id) {
 		this.request = req;
 		this.id = id;
 	}

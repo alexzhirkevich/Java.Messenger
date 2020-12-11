@@ -21,7 +21,7 @@ public class RequestChat extends Request {
 		super(REQ_CHAT);
 	}
 
-	public RequestChat(User requester, User withUser) {
+	public RequestChat(@Element(name = "requester") User requester,@Element(name = "withUser") User withUser) {
 		super(REQ_CHAT);
 		setRequester(requester);
 		setWithUser(withUser);

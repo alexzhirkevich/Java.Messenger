@@ -1,5 +1,6 @@
 package com.messenger.application.protocol.response;
 
+import com.messenger.application.protocol.User;
 import com.messenger.application.protocol.request.Request;
 
 import org.simpleframework.xml.Element;
@@ -11,26 +12,26 @@ public class ResponseRegister extends Response {
 	private static final long serialVersionUID = 1L;
 
 	@Element
-	private int userID;
+	private User user;
 
 	private ResponseRegister() {
 	}
 
-	public ResponseRegister(byte id, int userID) {
+	public ResponseRegister(byte id, @Element(name = "user")User user) {
 		super(Request.REQ_REGISTER, id);
-		setUserID(id);
+		setUser(user);
 	}
 
-	public ResponseRegister(byte id, int userID, String errorMsg) {
+	public ResponseRegister(byte id, @Element(name = "user")User user, String errorMsg) {
 		super(Request.REQ_REGISTER, id, errorMsg);
-		setUserID(id);
+		setUser(user);
 	}
 
-	public int getUserID() {
-		return userID;
+	public User getUser() {
+		return new User(user);
 	}
 
-	public void setUserID(int userID) {
-		this.userID = userID;
+	public void setUser(User user) {
+		this.user = new User(user);
 	}
 }

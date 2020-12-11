@@ -1,5 +1,6 @@
 package com.messenger.application.protocol.response;
 
+import com.messenger.application.protocol.User;
 import com.messenger.application.protocol.request.Request;
 
 import org.simpleframework.xml.Element;
@@ -10,26 +11,26 @@ public class ResponseLogin extends Response {
 
 	private static final long serialVersionUID = 1L;
 
-	@Element
-	private long userId;
+	@Element(required = false)
+	private User user;
 
 	private ResponseLogin() { }
 
-	public ResponseLogin(byte id, int userId) {
+	public ResponseLogin(byte id, @Element(name = "user")User user) {
 		super(Request.REQ_LOGIN, id);
-		setUserId(userId);
+		setUser(user);
 	}
 
-	public ResponseLogin(byte id, int userId, String errorMsg) {
+	public ResponseLogin(byte id, @Element(name = "user") User user, String errorMsg) {
 		super(Request.REQ_LOGIN, id, errorMsg);
-		setUserId(userId);
+		setUser(user);
 	}
 
-	public long getUserId() {
-		return userId;
+	public User getUser() {
+		return user!=null ? new User(user) : null;
 	}
 
-	public void setUserId(long userId) {
-		this.userId = userId;
+	public void setUser(User user) {
+		this.user = user!=null ? new User(user) : null;
 	}
 }

@@ -12,12 +12,12 @@ public class ResponseChat extends Response {
 
 	private static final long serialVersionUID = 1L;
 
-	@Element
+	@Element(required = false)
 	private Chat chat;
 
 	private ResponseChat() {}
 
-	public ResponseChat(byte id, Chat chat)  {
+	public ResponseChat(byte id, @Element(name = "chat")Chat chat)  {
 		super(Request.REQ_INVALID, id);
 		setChat(chat);
 	}

@@ -9,17 +9,17 @@ public class RequestLogin extends Request {
 
 	private static final long serialVersionUID = 1L;
 
-	@Element
+	@Element(name = "phone")
 	private String phone;
 
-	@Element
+	@Element(name = "passHash")
 	private String passHash;
 
 	private RequestLogin() {
 		super(REQ_LOGIN);
 	}
 
-	public RequestLogin(String phone, String passHash) {
+	public RequestLogin(@Element(name = "phone") String phone, @Element(name = "passHash") String passHash) {
 		super(REQ_LOGIN);
 		setPhone(phone);
 		setPassHash(passHash);
@@ -41,3 +41,4 @@ public class RequestLogin extends Request {
 		this.passHash = passHash;
 	}
 }
+

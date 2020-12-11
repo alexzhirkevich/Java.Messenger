@@ -7,6 +7,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -15,31 +16,34 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 public abstract class Xml {
 
 	public static String toXml(Xml msg) throws Exception {
-
 		Serializer s = new Persister();
 		StringWriter sw = new StringWriter();
 		s.write(msg,sw);
-		return sw.getBuffer().toString();
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +sw.getBuffer().toString();
 	}
 
 	public static Xml fromXml(String xmlData)
 			throws Exception {
+
 		Class<? extends Xml> dataClass;
 		dataClass = getClassByName(getRootElement(xmlData));
 
 		Serializer s = new Persister();
-		return s.read(dataClass,xmlData);
+		if (s.validate(dataClass,xmlData))
+			return s.read(dataClass,xmlData);
+		return null;
 	}
 
 	private static String getRootElement(String xmlData) throws IOException, SAXException, ParserConfigurationException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document doc = builder.parse(xmlData);
+		Document doc = builder.parse(new InputSource(new StringReader(xmlData)));
 		Element root = doc.getDocumentElement();
 		return root.getTagName();
 	}

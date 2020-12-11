@@ -14,16 +14,16 @@ public class RequestRegister extends Request {
 	private User user;
 
 	@Element
-	private String passHash;
+	private String password;
 
 	private RequestRegister()  {
 		super(REQ_REGISTER);
 	}
 
-	public RequestRegister(User user, String passHash) {
+	public RequestRegister(@Element(name = "user")User user,@Element(name = "password") String password) {
 		super(REQ_REGISTER);
 		setUser(user);
-		setPassHash(passHash);
+		setPassword(password);
 	}
 
 	public User getUser() {
@@ -34,11 +34,11 @@ public class RequestRegister extends Request {
 		this.user =  user != null ? new User(user):null ;
 	}
 
-	public String getPassHash() {
-		return passHash;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPassHash(String passHash) {
-		this.passHash = passHash;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

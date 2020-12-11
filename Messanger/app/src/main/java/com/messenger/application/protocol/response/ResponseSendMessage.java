@@ -15,12 +15,12 @@ public class ResponseSendMessage extends Response {
 	@Element
 	private int msgId;
 
-	public ResponseSendMessage(byte id,int msgId) {
+	public ResponseSendMessage(byte id,@Element(name = "msgId")int msgId) {
 		super(Request.REQ_SENDMSG, id);
 		setMsgId(msgId);
 	}
 
-	public ResponseSendMessage(byte id, int msgId, String errorMsg) {
+	public ResponseSendMessage(byte id, @Element(name = "msgId")int msgId, String errorMsg) {
 		super(Request.REQ_SENDMSG, id, errorMsg);
 		setMsgId(msgId);
 	}

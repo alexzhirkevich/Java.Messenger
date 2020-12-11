@@ -2,24 +2,46 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.messenger">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:launchMode="singleTop"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Messanger">
+
         <activity
-            android:name="com.messenger.application.ui.login.LoginActivity"
-            android:label="@string/app_name">
+            android:name=".application.ui.login.LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity
+            android:name=".application.ui.register.RegisterActivity"
+            android:label="@string/action_register"
+            android:parentActivityName=".application.ui.login.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".application.ui.login.LoginActivity" />
+        </activity>
+
+        <activity
+            android:name=".application.ui.custom.layout.CustomLayoutDialogsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-    </application>
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+        </activity>
+
+
+        <activity
+            android:name=".application.ui.custom.layout.CustomLayoutMessagesActivity"/>
+
+
+    </application>
 
 </manifest>

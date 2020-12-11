@@ -17,7 +17,7 @@ public class RequestSendMessage extends Request {
 		super(REQ_SENDMSG);
 	}
 
-	public RequestSendMessage(Message message) {
+	public RequestSendMessage(@Element(name = "message")Message message) {
 		super(REQ_SENDMSG);
 	}
 

@@ -8,9 +8,10 @@ import com.messenger.application.protocol.User;
  */
 public class LoggedInUser extends User {
 
-    private Connection connection;
+    public final Connection connection;
 
-    public LoggedInUser(Connection connection) {
+    public LoggedInUser(User user, Connection connection) {
+        super(user);
         this.connection = connection;
     }
 }
