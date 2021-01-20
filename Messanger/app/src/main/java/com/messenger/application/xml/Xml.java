@@ -61,6 +61,8 @@ public abstract class Xml {
 				return RequestChat.class;
 			else if (name.equals(RequestSendMessage.class.getSimpleName()))
 				return RequestSendMessage.class;
+			else if (name.equals(RequestDialogMembers.class.getSimpleName()))
+				return RequestDialogMembers.class;
 
 			else if (name.equals(RequestDisconnect.class.getSimpleName()))
 				return RequestDisconnect.class;
@@ -75,6 +77,8 @@ public abstract class Xml {
 				return ResponseChat.class;
 			else if (name.equals(ResponseSendMessage.class.getSimpleName()))
 				return ResponseSendMessage.class;
+			else if (name.equals(ResponseDialogMembers.class.getSimpleName()))
+				return ResponseDialogMembers.class;
 		}
 
 		return null;

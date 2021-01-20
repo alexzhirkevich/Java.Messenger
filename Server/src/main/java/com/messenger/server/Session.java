@@ -1,12 +1,11 @@
 package com.messenger.server;
 
-import com.messenger.protocol.Message;
-import com.messenger.protocol.User;
+import com.messenger.protocol.*;
 import com.messenger.protocol.request.*;
 import com.messenger.protocol.response.*;
-import com.messenger.xml.Xml;
+import com.messenger.protocol.Xml;
+import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -27,9 +26,11 @@ public class Session extends Thread implements Closeable {
 		this.socket.setSoTimeout(5000);
 	}
 
-	public void sendResponse(Response req) throws Exception {
-		if (req != null)
-			dataOutputStream.writeUTF(Xml.toXml(req));
+	public void sendResponse(Response res) throws Exception {
+		if (res != null) {
+			dataOutputStream.writeUTF(Xml.toXml(res));
+			dataOutputStream.flush();
+		}
 	}
 
 
@@ -58,18 +59,17 @@ public class Session extends Thread implements Closeable {
 	public void run() {
 		try {
 			this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-			dataOutputStream.flush();
 			this.dataInputStream = new DataInputStream(socket.getInputStream());
-		}catch (Exception ignore){}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 
 			isRunning = true;
 			while (isRunning) {
 				Request req = null;
 				try {
 					req = (Request) Xml.fromXml(dataInputStream.readUTF());
-				} catch (Exception ignore){
-					continue;
-				}
+				} catch (Exception ignore){}
 
 				try {
 					sendResponse(processRequest(req));
@@ -130,58 +130,75 @@ public class Session extends Thread implements Closeable {
 
 	private ResponseChat chat(RequestChat req) {
 		try {
+			if (user == null || req.getUserId() == null || req.getWithUserId() == null ||
+					(req.getWithUserId()!= user.getId() && req.getUserId() != user.getId()))
+				return new ResponseChat(Responser.RES_ERROR, null, "Error");
 
-			if (user == null || !user.equals(req.getRequester()))
-				return new ResponseChat(Responser.RES_NOTAUTHORIZED, null, "Not authorised");
-
-			if (!server.database.userExists(req.getRequester().getPhone()))
+			if (!server.database.userExists(req.getUserId()))
 				return new ResponseChat(Response.RES_USERNOTEXISTS, null, "Requested user1 doesn't exist");
-			if (!server.database.userExists(req.getRequester().getPhone()))
+			if (req.getWithUserId() == -1 || !server.database.userExists(req.getWithUserId()))
 				return new ResponseChat(Response.RES_USERNOTEXISTS, null, "Requested user2 doesn't exist");
 
-			return new ResponseChat(Response.RES_OK, server.database.getChat(req.getRequester(),req.getWithUser()));
+			return new ResponseChat(Response.RES_OK, server.database.getChat(req.getUserId(),req.getWithUserId()));
 		}
 		catch (SQLException e) {
-			return new ResponseChat(Response.RES_ERROR, null, "Chats error");
+			return new ResponseChat(Response.RES_ERROR, null, "Error");
 		}
 	}
 
 	private ResponseLogin login(RequestLogin req) {
 		try {
 			if (!server.database.userExists(req.getPhone()))
-				return new ResponseLogin(Response.RES_NOTAUTHORIZED, -1,"User is not registered");
+				return new ResponseLogin(Response.RES_USERNOTEXISTS, null,"User is not registered");
 			if (!server.database.passCorrect(req.getPhone(),req.getPassHash()))
-				return new ResponseLogin(Response.RES_WRONGPASSWORD,-1,"Incorrect password");
+				return new ResponseLogin(Response.RES_WRONGPASSWORD,null,"Incorrect password");
 
 			int id = server.database.getUserId(req.getPhone());
 			user = server.database.getUser(id);
 
 			System.out.println("User logged in: " + user.getPhone());
 
-			return new ResponseLogin(Response.RES_OK,id);
+			return new ResponseLogin(Response.RES_OK,user);
 		} catch (SQLException e){
-			return  new ResponseLogin(Response.RES_ERROR,-1, "Login error");
+			return  new ResponseLogin(Response.RES_ERROR,user, "Login error");
 		}
 	}
 
 	private ResponseRegister register(RequestRegister req) {
 		try {
 			if (server.database.userExists(req.getUser().getPhone()))
-				return new ResponseRegister(Response.RES_USEREXISTS, -1, "User is already exists");
+				return new ResponseRegister(Response.RES_USEREXISTS, null, "User is already exists");
 			server.database.addUser(
 					req.getUser().getFirstName(),
 					req.getUser().getLastName(),
-					req.getUser().getPhone(), req.getPassHash());
+					req.getUser().getPhone(), BCrypt.hashpw(req.getPassword(),BCrypt.gensalt()));
 			int userID = server.database.getUserId(req.getUser().getPhone());
-			return new ResponseRegister(Response.RES_OK, userID);
+			User user = req.getUser();
+			user.setId(userID);
+			this.user = new User(user);
+			return new ResponseRegister(Response.RES_OK, user);
 		} catch (SQLException e) {
-			return new ResponseRegister(Response.RES_ERROR, -1,"Register fail");
+			return new ResponseRegister(Response.RES_ERROR, null,"Register fail");
+		}
+	}
+
+	private ResponseDialogMembers dialogMembers(RequestDialogMembers req){
+		try{
+			if (user == null || user.getId() != req.getUser().getId())
+				return new ResponseDialogMembers(Response.RES_ERROR,null,"Error");
+
+			if (server.database.userExists(req.getUser().getId())) {
+				return new ResponseDialogMembers(Response.RES_USERNOTEXISTS,null,"Requester is not exists");
+		}
+		Integer[] ids = server.database.getAllDialogs(req.getUser().getId());
+		return new ResponseDialogMembers(Response.RES_OK,ids);
+		} catch (Exception e){
+			return new ResponseDialogMembers(Response.RES_ERROR,null,"Failed to get chat members");
 		}
 	}
 
 	private void disconnect(RequestDisconnect req) {
-		if (user != null && user.equals(req.getUser()))
-			close();
+		close();
 	}
 
 	protected User getUser() {

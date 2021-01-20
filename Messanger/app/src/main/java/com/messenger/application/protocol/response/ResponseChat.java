@@ -22,7 +22,7 @@ public class ResponseChat extends Response {
 		setChat(chat);
 	}
 
-	public ResponseChat(byte id, Chat chat, String errorMsg){
+	public ResponseChat(byte id, @Element(name = "chat")Chat chat, String errorMsg){
 		super(Request.REQ_INVALID, id, errorMsg);
 		setChat(chat);
 	}

@@ -5,7 +5,6 @@ import com.messenger.protocol.User;
 import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class Server extends Thread implements Closeable {
 
 	public Server(int port,String dbName){
 		this.PORT = port;
-		this.database = new Database(dbName);
+		this.database = new Database(dbName,this);
 		sessions = new ArrayList<>();
 	}
 
@@ -37,9 +36,14 @@ public class Server extends Thread implements Closeable {
 		System.out.println("Server started on port: " + PORT);
 
 		while (isRunning){
+			Socket con=null;
 			try {
-				Socket con = serverSocket.accept();
-				System.out.println("Connected");
+				con = serverSocket.accept();
+			}catch (IOException ignore){
+				continue;
+			}
+
+			try{
 				Session session = new Session(this, con);
 				sessions.add(session);
 				session.start();
@@ -52,6 +56,14 @@ public class Server extends Thread implements Closeable {
 	protected void endSession(Session session){
 		if (session != null)
 			sessions.remove(session);
+	}
+
+	protected boolean isUserOnline(int userId){
+		for (Session s : sessions){
+			if (s.getUser().getId() == userId)
+				return true;
+		}
+		return false;
 	}
 
 	protected DataOutputStream getUserOutputStream(User user) {

@@ -14,6 +14,9 @@ public class Chat implements Serializable {
 	private final static long serialVersionUID = 1L;
 
 	@Element
+	private Integer id;
+
+	@Element
 	private User user1;
 
 	@Element
@@ -25,13 +28,21 @@ public class Chat implements Serializable {
 	private Chat(){}
 
 	public Chat(Chat chat){
-		this(chat.getUser1(),chat.getUser2(),chat.getMessages());
+		this(chat.getId(),chat.getUser1(),chat.getUser2(),chat.getMessages());
 	}
 
-	public Chat(User user1, User user2,  Message[] messages){
+	public Chat(Integer id,User user1, User user2,  Message[] messages){
 		setUser1(user1);
 		setUser2(user2);
 		setMessages(messages);
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public User getUser1() {

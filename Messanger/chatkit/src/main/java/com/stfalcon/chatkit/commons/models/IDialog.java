@@ -24,9 +24,9 @@ import java.util.List;
 
 public interface IDialog<MESSAGE extends IMessage> {
 
-    String getId();
+    Integer getId();
 
-    String getDialogPhoto();
+    Byte[] getDialogPhoto();
 
     String getDialogName();
 

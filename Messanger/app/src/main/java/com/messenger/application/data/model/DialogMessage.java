@@ -1,8 +1,11 @@
 package com.messenger.application.data.model;
 
+import com.messenger.application.protocol.Message;
+import com.messenger.application.protocol.User;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
 
+import java.util.Arrays;
 import java.util.Date;
 
 /*
@@ -12,26 +15,26 @@ public class DialogMessage implements IMessage,
         MessageContentType.Image, /*this is for default image messages implementation*/
         MessageContentType /*and this one is for custom content type (in this case - voice message)*/ {
 
-    private String id;
+    private Integer id;
     private String text;
     private Date createdAt;
-    private MessangerUser user;
-    private Image image;
+    private MessageUser user;
+    private Byte[] image;
     private Voice voice;
 
-    public DialogMessage(String id, MessangerUser user, String text) {
+    public DialogMessage(Integer id, MessageUser user, String text) {
         this(id, user, text, new Date());
     }
 
-    public DialogMessage(String id, MessangerUser user, String text, Date createdAt) {
+    public DialogMessage(Integer id, MessageUser user, String text, Date createdAt) {
         this.id = id;
         this.text = text;
-        this.user = user;
+        this.user = new MessageUser(user);
         this.createdAt = createdAt;
     }
 
     @Override
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -46,13 +49,13 @@ public class DialogMessage implements IMessage,
     }
 
     @Override
-    public MessangerUser getUser() {
+    public MessageUser getUser() {
         return this.user;
     }
 
     @Override
-    public String getImageUrl() {
-        return image == null ? null : image.url;
+    public Byte[] getImage() {
+        return image == null ? null : Arrays.copyOf(image,image.length);
     }
 
     public Voice getVoice() {
@@ -71,21 +74,12 @@ public class DialogMessage implements IMessage,
         this.createdAt = createdAt;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImage(Byte[] image) {
+        this.image = image != null? Arrays.copyOf(image,image.length):null;
     }
 
     public void setVoice(Voice voice) {
         this.voice = voice;
-    }
-
-    public static class Image {
-
-        private String url;
-
-        public Image(String url) {
-            this.url = url;
-        }
     }
 
     public static class Voice {

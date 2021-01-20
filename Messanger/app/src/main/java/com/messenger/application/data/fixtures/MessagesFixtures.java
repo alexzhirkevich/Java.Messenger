@@ -1,7 +1,7 @@
 package com.messenger.application.data.fixtures;
 
 import com.messenger.application.data.model.DialogMessage;
-import com.messenger.application.data.model.MessangerUser;
+import com.messenger.application.data.model.MessageUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,9 +59,9 @@ public final class MessagesFixtures extends FixturesData {
         return messages;
     }
 
-    private static MessangerUser getUser() {
+    private static MessageUser getUser() {
         boolean even = rnd.nextBoolean();
-        return new MessangerUser(
+        return new MessageUser(
                 even ? "0" : "1",
                 even ? names.get(0) : names.get(1),
                 even ? avatars.get(0) : avatars.get(1),

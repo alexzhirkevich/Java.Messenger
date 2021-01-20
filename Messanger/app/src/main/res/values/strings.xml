@@ -18,6 +18,7 @@
     <string name="error_login">"Login failed"</string>
     <string name="error_register">"Register failed"</string>
     <string name="error_already_logged_in">Already logged in</string>
+    <string name="error_not_authorized">Not authorised error</string>
     <string name="error_wrong_password">"Wrong password"</string>
     <string name="error_user_exist">"User is already exists"</string>
     <string name="error_user_does_not_exist">"User doesn't exist"</string>

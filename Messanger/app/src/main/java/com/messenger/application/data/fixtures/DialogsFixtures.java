@@ -2,21 +2,19 @@ package com.messenger.application.data.fixtures;
 
 import com.messenger.application.data.model.Dialog;
 import com.messenger.application.data.model.DialogMessage;
-import com.messenger.application.data.model.MessangerUser;
+import com.messenger.application.data.model.MessageUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-/*
- * Created by Anton Bevza on 07.09.16.
- */
 public final class DialogsFixtures extends FixturesData {
     private DialogsFixtures() {
         throw new AssertionError();
     }
 
     public static ArrayList<Dialog> getDialogs() {
+
         ArrayList<Dialog> chats = new ArrayList<>();
 
         for (int i = 0; i < 20; i++) {
@@ -31,18 +29,18 @@ public final class DialogsFixtures extends FixturesData {
     }
 
     private static Dialog getDialog(int i, Date lastMessageCreatedAt) {
-        ArrayList<MessangerUser> users = getUsers();
+        ArrayList<MessageUser> users = getUsers();
         return new Dialog(
                 getRandomId(),
-                users.size() > 1 ? groupChatTitles.get(users.size() - 2) : users.get(0).getName(),
+                users.size() > 1 ? groupChatTitles.get(users.size() - 2) : users.get(0).getFirstName(),
                 users.size() > 1 ? groupChatImages.get(users.size() - 2) : getRandomAvatar(),
                 users,
                 getMessage(lastMessageCreatedAt),
                 i < 3 ? 3 - i : 0);
     }
 
-    private static ArrayList<MessangerUser> getUsers() {
-        ArrayList<MessangerUser> users = new ArrayList<>();
+    private static ArrayList<MessageUser> getUsers() {
+        ArrayList<MessageUser> users = new ArrayList<>();
         int usersCount = 1 + rnd.nextInt(4);
 
         for (int i = 0; i < usersCount; i++) {
@@ -52,8 +50,8 @@ public final class DialogsFixtures extends FixturesData {
         return users;
     }
 
-    private static MessangerUser getUser() {
-        return new MessangerUser(
+    private static MessageUser getUser() {
+        return new MessageUser(
                 getRandomId(),
                 getRandomName(),
                 getRandomAvatar(),

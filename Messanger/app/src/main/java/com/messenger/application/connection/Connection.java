@@ -1,24 +1,27 @@
 package com.messenger.application.connection;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.messenger.R;
-import com.messenger.application.data.AuthRepository;
 import com.messenger.application.data.Result;
+import com.messenger.application.data.model.Dialog;
+import com.messenger.application.data.model.DialogMessage;
 import com.messenger.application.data.model.LoggedInUser;
+import com.messenger.application.data.model.MessageUser;
+import com.messenger.application.protocol.Chat;
 import com.messenger.application.protocol.Config;
+import com.messenger.application.protocol.Message;
 import com.messenger.application.protocol.User;
 import com.messenger.application.protocol.request.Request;
+import com.messenger.application.protocol.request.RequestChat;
+import com.messenger.application.protocol.request.RequestDialogMembers;
 import com.messenger.application.protocol.request.RequestDisconnect;
 import com.messenger.application.protocol.request.RequestLogin;
 import com.messenger.application.protocol.request.RequestRegister;
 import com.messenger.application.protocol.response.Response;
+import com.messenger.application.protocol.response.ResponseChat;
+import com.messenger.application.protocol.response.ResponseDialogMembers;
 import com.messenger.application.protocol.response.ResponseLogin;
 import com.messenger.application.protocol.response.ResponseRegister;
 import com.messenger.application.xml.Xml;
-
-import org.apache.http.conn.scheme.SocketFactory;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -26,7 +29,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.Provider;
+import java.util.ArrayList;
 
 
 public class Connection implements Closeable {
@@ -59,7 +62,7 @@ public class Connection implements Closeable {
         return instance;
     }
 
-    public Result<LoggedInUser> register(User user, String password){
+    public Result<LoggedInUser> register(com.messenger.application.protocol.User user, String password){
 
         ResponseRegister response = null;
         try {
@@ -111,8 +114,6 @@ public class Connection implements Closeable {
         return (Response) Xml.fromXml(dataInputStream.readUTF());
     }
 
-
-
     public void logout(){
         if (instance!=null){
             try {
@@ -123,6 +124,39 @@ public class Connection implements Closeable {
                 instance = null;
             } catch (Exception ignore){}
         }
+    }
+
+    public Result<Dialog[]> getDialogList() throws Exception {
+        if (user == null)
+            return new Result.Error(R.string.error_not_authorized);
+        if (instance == null)
+            return new Result.Error(R.string.error_login);
+        ArrayList<Dialog> dialogs = new ArrayList<>();
+        ResponseDialogMembers res = (ResponseDialogMembers) sendRequest(new RequestDialogMembers(user));
+        for (Integer i : res.getDialogMemberIds()) {
+            try {
+                ResponseChat responseChat = (ResponseChat) sendRequest(new RequestChat(user.getId(), i));
+                Chat chat = responseChat.getChat();
+                if (chat != null) {
+                    ArrayList<MessageUser> users = new ArrayList<>();
+                    Message[] messages = chat.getMessages();
+                    DialogMessage[] dialogMessages = new DialogMessage[messages.length];
+                    for (int k = 0; k < messages.length; k++) {
+                        MessageUser user = this.user.getId().equals(messages[i].getFromUser().getId()) ? new MessageUser(messages[i].getFromUser()) : new MessageUser(messages[i].getToUser());
+                        dialogMessages[i] = new DialogMessage(messages[i].getId(), user, messages[i].getText());
+                    }
+                    User a = chat.getUser1();
+                    User b = chat.getUser2();
+                    users.add(new MessageUser(a));
+                    users.add(new MessageUser(b));
+
+                    Dialog dialog = new Dialog(chat.getId(), b.getFirstName() + " " + b.getLastName(), b.getAvatar(), users, dialogMessages[dialogMessages.length - 1], 0);
+                    dialogs.add(dialog);
+                }
+            } catch (Exception ignore) {
+            }
+        }
+        return new Result.Success<>(dialogs.toArray());
     }
 
     @Override

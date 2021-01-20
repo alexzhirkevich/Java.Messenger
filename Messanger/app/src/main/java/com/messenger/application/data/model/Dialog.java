@@ -3,22 +3,23 @@ package com.messenger.application.data.model;
 import com.stfalcon.chatkit.commons.models.IDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * Created by troy379 on 04.04.17.
  */
 public class Dialog implements IDialog<DialogMessage> {
 
-    private String id;
-    private String dialogPhoto;
+    private Integer id;
+    private Byte[] dialogPhoto;
     private String dialogName;
-    private ArrayList<MessangerUser> users;
+    private ArrayList<MessageUser> users;
     private DialogMessage lastMessage;
 
     private int unreadCount;
 
-    public Dialog(String id, String name, String photo,
-                  ArrayList<MessangerUser> users, DialogMessage lastMessage, int unreadCount) {
+    public Dialog(Integer id, String name, Byte[] photo,
+                  ArrayList<MessageUser> users, DialogMessage lastMessage, int unreadCount) {
 
         this.id = id;
         this.dialogName = name;
@@ -29,13 +30,13 @@ public class Dialog implements IDialog<DialogMessage> {
     }
 
     @Override
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
     @Override
-    public String getDialogPhoto() {
-        return dialogPhoto;
+    public Byte[] getDialogPhoto() {
+        return Arrays.copyOf(dialogPhoto,dialogPhoto.length);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class Dialog implements IDialog<DialogMessage> {
     }
 
     @Override
-    public ArrayList<MessangerUser> getUsers() {
+    public ArrayList<MessageUser> getUsers() {
         return users;
     }
 

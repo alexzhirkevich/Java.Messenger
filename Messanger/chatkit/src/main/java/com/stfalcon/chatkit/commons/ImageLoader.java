@@ -25,6 +25,6 @@ import androidx.annotation.Nullable;
  */
 public interface ImageLoader {
 
-    void loadImage(ImageView imageView, @Nullable String url, @Nullable Object payload);
+    void loadImage(ImageView imageView, @Nullable Byte[] avatar, @Nullable Object payload);
 
 }

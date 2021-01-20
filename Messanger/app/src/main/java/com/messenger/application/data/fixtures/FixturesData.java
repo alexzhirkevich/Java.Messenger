@@ -2,6 +2,7 @@ package com.messenger.application.data.fixtures;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 /*
@@ -75,12 +76,12 @@ abstract class FixturesData {
         }
     };
 
-    static String getRandomId() {
-        return Long.toString(UUID.randomUUID().getLeastSignificantBits());
+    static Integer getRandomId() {
+        return new Random().nextInt();
     }
 
     static String getRandomAvatar() {
-        return avatars.get(rnd.nextInt(avatars.size()));
+        return null;
     }
 
     static String getRandomGroupChatImage() {

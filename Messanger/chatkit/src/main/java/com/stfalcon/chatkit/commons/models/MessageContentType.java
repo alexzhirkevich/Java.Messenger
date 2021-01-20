@@ -35,7 +35,7 @@ public interface MessageContentType extends IMessage {
      */
     interface Image extends IMessage {
         @Nullable
-        String getImageUrl();
+        Byte[] getImage();
     }
 
     // other default types will be here

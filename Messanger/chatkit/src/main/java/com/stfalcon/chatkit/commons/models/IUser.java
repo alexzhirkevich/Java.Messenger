@@ -26,19 +26,21 @@ public interface IUser {
      *
      * @return the user's id
      * */
-    String getId();
+    Integer getId();
 
     /**
      * Returns the user's name
      *
      * @return the user's name
      * */
-    String getName();
+    String getFirstName();
 
     /**
      * Returns the user's avatar image url
      *
      * @return the user's avatar image url
      * */
-    String getAvatar();
+    Byte[] getAvatar();
+
+    String getLastName();
 }

@@ -1,14 +1,14 @@
 package com.messenger.application.protocol;
 
-
+import androidx.annotation.Nullable;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
-
 
 @Root
 public class User implements Serializable {
@@ -16,37 +16,53 @@ public class User implements Serializable {
 	private static final long SerialVersionUID = 1L;
 
 	@Attribute(name = "id")
-	int id;
+	Integer id;
 
 	@Element(name = "firstName")
 	String firstName;
 
+	@Nullable
 	@Element(name = "lastName")
 	String lastName;
 
 	@Element(name = "phone")
 	String phone;
 
+	@Element(name = "online")
+	Boolean online;
+
+	@Nullable
+	@Element(name = "picture")
+	Byte[] avatar;
+
 	protected User() {
 		this.firstName = "unknown";
 		this.phone = "unknown";
 	}
 
-	public User(String firstName, String lastName, String phone) {
+	public User(@Element(name = "firstName")Integer id,
+				@Element(name = "firstName") String firstName,
+				@Element(name = "lastName") @Nullable String lastName,
+				@Element(name = "phone") String phone,
+				@Element(name = "online") Boolean online,
+				@Element(name = "picture") @Nullable Byte[] picture) {
+		setId(id);
 		setFirstName(firstName);
 		setLastName(lastName);
 		setPhone(phone);
+		setOnline(online);
+		setAvatar(picture);
 	}
 
 	public User(User user) {
-		this(user.firstName, user.lastName, user.phone);
+		this(user.id, user.firstName, user.lastName, user.phone,user.online,user.avatar);
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -72,6 +88,23 @@ public class User implements Serializable {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public void setOnline(Boolean online) {
+		this.online = online;
+	}
+
+	public Boolean isOnline() {
+		return online;
+	}
+
+	@Nullable
+	public Byte[] getAvatar() {
+		return Arrays.copyOf(avatar, avatar.length);
+	}
+
+	public void setAvatar(@Nullable Byte[] avatar) {
+		this.avatar = avatar !=null? Arrays.copyOf(avatar, avatar.length) : null;
 	}
 
 	@Override

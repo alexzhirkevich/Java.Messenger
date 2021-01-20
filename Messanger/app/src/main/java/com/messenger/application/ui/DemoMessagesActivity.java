@@ -125,7 +125,7 @@ public abstract class DemoMessagesActivity extends AppCompatActivity
                 if (text == null) text = "[attachment]";
 
                 return String.format(Locale.getDefault(), "%s: %s (%s)",
-                        message.getUser().getName(), text, createdAt);
+                        message.getUser().getFirstName(), text, createdAt);
             }
         };
     }

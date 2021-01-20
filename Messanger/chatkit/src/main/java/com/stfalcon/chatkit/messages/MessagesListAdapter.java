@@ -54,7 +54,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
 
     protected List<Wrapper> items;
     private MessageHolders holders;
-    private String senderId;
+    private Integer senderId;
 
     private int selectedItemsCount;
     private SelectionListener selectionListener;
@@ -76,7 +76,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      * @param senderId    identifier of sender.
      * @param imageLoader image loading method.
      */
-    public MessagesListAdapter(String senderId, ImageLoader imageLoader) {
+    public MessagesListAdapter(Integer senderId, ImageLoader imageLoader) {
         this(senderId, new MessageHolders(), imageLoader);
     }
 
@@ -87,7 +87,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      * @param holders     custom layouts and view holders. See {@link MessageHolders} documentation for details
      * @param imageLoader image loading method.
      */
-    public MessagesListAdapter(String senderId, MessageHolders holders,
+    public MessagesListAdapter(Integer senderId, MessageHolders holders,
                                ImageLoader imageLoader) {
         this.senderId = senderId;
         this.holders = holders;
@@ -202,7 +202,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      * @param oldId      an identifier of message to update.
      * @param newMessage new message object.
      */
-    public boolean update(String oldId, MESSAGE newMessage) {
+    public boolean update(Integer oldId, MESSAGE newMessage) {
         int position = getMessagePositionById(oldId);
         if (position >= 0) {
             Wrapper<MESSAGE> element = new Wrapper<>(newMessage);
@@ -293,7 +293,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      *
      * @param id identifier of message to delete.
      */
-    public void deleteById(String id) {
+    public void deleteById(Integer id) {
         int index = getMessagePositionById(id);
         if (index >= 0) {
             items.remove(index);
@@ -307,9 +307,9 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      *
      * @param ids array of identifiers of messages to delete.
      */
-    public void deleteByIds(String[] ids) {
+    public void deleteByIds(Integer[] ids) {
         boolean result = false;
-        for (String id : ids) {
+        for (Integer id : ids) {
             int index = getMessagePositionById(id);
             if (index >= 0) {
                 items.remove(index);
@@ -545,12 +545,12 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     }
 
     @SuppressWarnings("unchecked")
-    private int getMessagePositionById(String id) {
+    private int getMessagePositionById(Integer id) {
         for (int i = 0; i < items.size(); i++) {
             Wrapper wrapper = items.get(i);
             if (wrapper.item instanceof IMessage) {
                 MESSAGE message = (MESSAGE) wrapper.item;
-                if (message.getId().contentEquals(id)) {
+                if (message.getId().equals(id)) {
                     return i;
                 }
             }
@@ -568,11 +568,11 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     }
 
     @SuppressWarnings("unchecked")
-    private boolean isPreviousSameAuthor(String id, int position) {
+    private boolean isPreviousSameAuthor(Integer id, int position) {
         int prevPosition = position + 1;
         if (items.size() <= prevPosition) return false;
         else return items.get(prevPosition).item instanceof IMessage
-                && ((MESSAGE) items.get(prevPosition).item).getUser().getId().contentEquals(id);
+                && ((MESSAGE) items.get(prevPosition).item).getUser().getId().equals(id);
     }
 
     private void incrementSelectedItemsCount() {

@@ -1,8 +1,6 @@
 package com.messenger.application.protocol.request;
 
 
-import com.messenger.application.protocol.User;
-
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
@@ -12,35 +10,34 @@ public class RequestChat extends Request {
 	private static final long serialVersionUID = 1L;
 
 	@Element
-	private User requester;
+	private Integer userId;
 
 	@Element
-	private User withUser;
+	private Integer withUserId;
 
 	private RequestChat() {
 		super(REQ_CHAT);
 	}
 
-	public RequestChat(@Element(name = "requester") User requester,@Element(name = "withUser") User withUser) {
+	public RequestChat(@Element(name = "userId") Integer userId,@Element(name = "withUserId") Integer withUserId) {
 		super(REQ_CHAT);
-		setRequester(requester);
-		setWithUser(withUser);
+		setUserId(userId);
+		setWithUserId(withUserId);
 	}
 
-	public User getRequester() {
-		return requester != null ? new User(requester) : null;
+	public Integer getUserId() {
+		return userId;
 	}
 
-	public void setRequester(User user) {
-		this.requester = user!=null ? new User(user) : null;
+	public void setUserId(Integer userID) {
+		this.userId = userID;
 	}
 
-	public User getWithUser() {
-		return withUser = withUser !=null ? new User(withUser):null;
+	public Integer getWithUserId() {
+		return withUserId;
 	}
-
-	public void setWithUser(User withUser) {
-		this.withUser = withUser !=null ? new User(withUser):null;
+	public void setWithUserId(Integer withUserid) {
+		this.withUserId = withUserId;
 	}
 
 }

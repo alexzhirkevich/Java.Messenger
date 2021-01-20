@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--    Side bar    -->
+    <item name="image_sidebar" type="id"/>
+    <item name="name_sidebar" type="id"/>
+    <item name="email_sidebar" type="id"/>
+
+
+<!--    <item name="text_dialogs" type="id"/>-->
+<!--    <item name="text_settings" type="id"/>-->
+<!--    <item name="text_about" type="id"/>-->
+
+    <item name="nav_view" type="id"/>
+    <item name="nav_host_fragment" type="id"/>
+    <item name="nav_dialogs" type="id"/>
+    <item name="nav_settings" type="id"/>
+    <item name="nav_about" type="id"/>
+
+    <item name="dialog_list_view" type="id"/>
+    <item name="dialog_avatar" type="id"/>
+    <item name="dialog_name" type="id"/>
+    <item name="dialog_last_message" type="id"/>
+    <item name="dialog_last_message_sender" type="id"/>
+    <item name="dialog_last_message_date" type="id"/>
+    <item name="dialog_button" type="id"/>
+    <item name="dialog_unread_count" type="id"/>
+
+
+    <item name="fragment_dialog" type="id" />
+</resources>
