@@ -1,4 +1,4 @@
-package com.messenger.app.ui.dialog;
+package com.messenger.app.ui.dialogs;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -41,6 +41,7 @@ public class DialogFloatingButton extends FloatingActionButton {
         hide.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                moving = true;
             }
 
             @Override
@@ -54,11 +55,13 @@ public class DialogFloatingButton extends FloatingActionButton {
 
             }
         });
+        hide.setFillAfter(true);
 
         show= AnimationUtils.loadAnimation(getContext(),R.anim.anim_fb_show);
         show.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                moving = true;
                 setVisibility(View.VISIBLE);
             }
 
@@ -72,22 +75,19 @@ public class DialogFloatingButton extends FloatingActionButton {
 
             }
         });
+        show.setFillBefore(true);
     }
 
     @Override
     public void hide() {
         if (!moving && getVisibility() == VISIBLE) {
-            setVisibility(INVISIBLE);
-            moving = true;
-           startAnimation(hide);
-        }
+            startAnimation(hide);
+       }
     }
 
     @Override
     public void show() {
         if (!moving && getVisibility() == INVISIBLE) {
-            setVisibility(VISIBLE);
-            moving = true;
             startAnimation(show);
         }
     }

@@ -6,19 +6,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/app_back"
     tools:openDrawer="start">
 
-    <include
-        layout="@layout/app_bar_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
+    <!--    CONTENT      -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activities.MainActivity">
+
+        <!--    APPBAR      -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.App.AppBarOverlay">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                style="@style/Toolbar"
+                app:popupTheme="@style/Theme.App.PopupOverlay">
+
+                <com.messenger.app.ui.dialogs.DialogSearch
+                    android:id="@+id/edit_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Name" />
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!--    DIALOGS      -->
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/fragment_dialog">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/dialog_scroll_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="insideOverlay"
+                    android:fadeScrollbars="true"
+                    android:scrollbarSize="2dp"
+                    android:scrollbarThumbVertical="@color/gray">
+
+                    <com.messenger.app.ui.dialogs.DialogRecyclerView
+                        android:id="@+id/dialog_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </androidx.core.widget.NestedScrollView>
+
+            <com.messenger.app.ui.dialogs.DialogFloatingButton
+                android:id="@+id/fab_dialogs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|end"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/side_nav_bar"
+                android:src="@drawable/ic_pen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            </RelativeLayout>
+
+    </LinearLayout>
+
+    <!--    DRAWER      -->
     <com.google.android.material.navigation.NavigationView
-        android:id="@id/nav_view"
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:background="@color/color_placeholder"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 </androidx.drawerlayout.widget.DrawerLayout>

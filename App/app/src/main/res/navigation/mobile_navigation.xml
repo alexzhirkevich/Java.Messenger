@@ -3,22 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_dialogs">
+    app:startDestination="@+id/graph_main">
+
 
     <fragment
-        android:id="@id/nav_dialogs"
-        android:name="com.messenger.app.ui.dialog.DialogsFragment"
-        android:label="@string/menu_dialogs"
-        tools:layout="@layout/fragment_dialogs" />
-
-    <fragment
-        android:id="@id/nav_settings"
+        android:id="@+id/nav_settings"
         android:name="com.messenger.app.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
         tools:layout="@layout/fragment_settings" />
 
     <fragment
-        android:id="@id/nav_about"
+        android:id="@+id/nav_about"
         android:name="com.messenger.app.ui.about.AboutFragment"
         android:label="@string/menu_about"
         tools:layout="@layout/fragment_about" />

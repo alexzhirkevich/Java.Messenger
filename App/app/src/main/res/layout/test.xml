@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <com.messenger.app.ui.dialog.DialogItem
+    <com.messenger.app.ui.dialogs.DialogItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-    <com.messenger.app.ui.dialog.DialogItem
+    <com.messenger.app.ui.dialogs.DialogItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>

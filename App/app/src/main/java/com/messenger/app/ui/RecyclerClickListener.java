@@ -1,4 +1,4 @@
-package com.messenger.app.ui.dialog;
+package com.messenger.app.ui;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
-public class DialogItemTouchListener implements RecyclerView.OnItemTouchListener {
+public class RecyclerClickListener implements RecyclerView.OnItemTouchListener {
 
     public interface OnItemClickListener {
         void onItemClick(View view, int position);
@@ -22,7 +22,7 @@ public class DialogItemTouchListener implements RecyclerView.OnItemTouchListener
     private final OnItemClickListener mListener;
     private final GestureDetector mGestureDetector;
 
-    public DialogItemTouchListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
+    public RecyclerClickListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 

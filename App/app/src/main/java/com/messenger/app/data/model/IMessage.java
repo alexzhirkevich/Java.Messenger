@@ -4,7 +4,7 @@ public interface IMessage {
 
     Integer getId();
 
-    Integer getSenderId();
+    User getSender();
 
     String getText();
     void setText(String text);

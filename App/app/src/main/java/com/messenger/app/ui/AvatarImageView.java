@@ -16,6 +16,10 @@ import androidx.annotation.RequiresPermission;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.messenger.app.R;
 
 public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageView {
@@ -53,7 +57,19 @@ public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageVie
     @Override
     public void setImageURI(@Nullable Uri uri) {
         if (uri!=null) {
-            Glide.with(this).load(uri).circleCrop().into(this);
+            //Glide.with(this).load(uri).circleCrop().into(this);
+            Glide.with(this).load(uri).circleCrop().addListener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    setImageDrawable(resource);
+                    return true;
+                }
+            }).submit();
             imageUri = uri.toString();
         }
     }

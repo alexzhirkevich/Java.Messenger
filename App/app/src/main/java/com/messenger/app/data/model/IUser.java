@@ -1,5 +1,7 @@
 package com.messenger.app.data.model;
 
+import androidx.annotation.Nullable;
+
 public interface IUser {
 
     Integer getId();
@@ -7,9 +9,11 @@ public interface IUser {
     String getFirstName();
     void setFirstName(String firstName);
 
-    String getLastName();
+    @Nullable String getLastName();
     void setLastName(String lastName);
 
-    String getImageUri();
+    @Nullable String getImageUri();
     void setImageUri(String uri);
+
+    String getFullName();
 }

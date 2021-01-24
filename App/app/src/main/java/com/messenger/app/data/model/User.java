@@ -1,23 +1,23 @@
 package com.messenger.app.data.model;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class User implements IUser{
     private final Integer id;
     private String firstName;
     private String lastName;
     private String imageUri;
 
-    public User(Integer id, String firstName){
+    public User(Integer id, @Nullable String imageUri, String firstName, @Nullable String lastName){
         this.id = id;
         this.firstName = firstName;
-    }
-    public User(Integer id, String firstName, String lastName){
-        this(id,firstName);
         this.lastName = lastName;
+        this.imageUri =  imageUri;
     }
 
-    public User(Integer id, String firstName, String lastName, String imageUri){
-        this(id,firstName,lastName);
-        this.imageUri = imageUri;
+    public User(final User u){
+        this(u.getId(),u.getFirstName(),u.getLastName(),u.getImageUri());
     }
 
     @Override
@@ -36,7 +36,7 @@ public class User implements IUser{
     }
 
     @Override
-    public String getLastName() {
+    public @Nullable String getLastName() {
         return lastName;
     }
 
@@ -46,12 +46,17 @@ public class User implements IUser{
     }
 
     @Override
-    public String getImageUri() {
+    public  @Nullable String getImageUri() {
         return imageUri;
     }
 
     @Override
     public void setImageUri(String uri) {
         this.imageUri = uri;
+    }
+
+    @Override
+    public String getFullName() {
+        return lastName!=null? firstName + " " + lastName : firstName;
     }
 }

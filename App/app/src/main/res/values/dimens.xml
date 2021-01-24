@@ -8,4 +8,13 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="avatar_padding">5dp</dimen>
+
+
+    <dimen name="dialog_name_size">20sp</dimen>
+    <dimen name="dialog_sender_size">15sp</dimen>
+    <dimen name="dialog_message_size">15sp</dimen>
+    <dimen name="dialog_date_size">12sp</dimen>
+    <dimen name="dialog_unread_size">12sp</dimen>
+
+    <dimen name="message_text_size">10sp</dimen>
 </resources>

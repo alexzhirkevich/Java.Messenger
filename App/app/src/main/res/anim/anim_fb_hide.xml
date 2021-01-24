@@ -6,12 +6,13 @@
         android:toXScale="0"
         android:fromYScale="1"
         android:toYScale="0"
-        android:duration="300"
+        android:duration="200"
         android:pivotX="50%"
         android:pivotY="50%"/>
 
     <translate
-        android:toYDelta="200"
+        android:fromYDelta="0"
+        android:toYDelta="300"
         android:duration="300" />
 
 </set>

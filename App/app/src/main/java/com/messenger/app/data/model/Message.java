@@ -1,25 +1,28 @@
 package com.messenger.app.data.model;
 
+import java.util.Date;
+
 public class Message implements IMessage{
 
     private final Integer id;
-    private final Integer senderId;
     private String text;
+    private User sender;
+    private Date date;
 
-    public Message(Integer id, Integer senderId, String text){
+    public Message(Integer id, User sender, String text, Date date){
         this.id = id;
-        this.senderId = senderId;
+        this.sender = new User(sender);
         this.text = text;
+        this.date = date;
+    }
+
+    public User getSender() {
+        return sender;
     }
 
     @Override
     public Integer getId() {
         return id;
-    }
-
-    @Override
-    public Integer getSenderId() {
-        return senderId;
     }
 
 
@@ -31,5 +34,9 @@ public class Message implements IMessage{
     @Override
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }

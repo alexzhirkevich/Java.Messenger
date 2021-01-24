@@ -1,21 +1,8 @@
-package com.messenger.app.ui.dialog;
+package com.messenger.app.ui.dialogs;
 
-import android.content.Context;
-import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.messenger.app.R;
-import com.messenger.app.ui.AvatarImageView;
-
-import java.util.Date;
-import java.util.StringTokenizer;
 
 public class DialogItem {
 
@@ -45,6 +32,10 @@ public class DialogItem {
         this.lastSender = lastSender;
         this.date = date;
         this.unreadCount = unreadCount;
+    }
+
+    public DialogItem(DialogItem di){
+        this(di.getImageUri(),di.getName(),di.getLastMessage(),di.getLastSender(),di.getDate(),di.getUnreadCount());
     }
 
     public String getImageUri() {
@@ -77,6 +68,12 @@ public class DialogItem {
         else{
             return lastSender.substring(0,MSG_MAX_LEN-2).concat("... :");
         }
+    }
+
+    @NonNull
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new DialogItem(imageUri,name,lastMessage,lastSender,date,unreadCount);
     }
 
     public Integer getUnreadCount() {

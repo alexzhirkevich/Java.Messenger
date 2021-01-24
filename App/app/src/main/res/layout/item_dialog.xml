@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    tools:context=".ui.dialog.DialogItem"
+    tools:context=".ui.dialogs.DialogItem"
     android:clickable="true"
     android:focusable="true">
 
     <com.messenger.app.ui.AvatarImageView
-        android:id="@id/dialog_avatar"
+        android:id="@+id/dialog_avatar"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginLeft="3dp"
@@ -23,39 +23,39 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
-        android:id="@id/dialog_name"
+        android:id="@+id/dialog_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="2dp"
         android:text="Name"
         android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textSize="@dimen/dialog_name_size"
         app:layout_constraintEnd_toStartOf="@id/dialog_last_message_date"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/dialog_avatar"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@id/dialog_last_message_sender"
+        android:id="@+id/dialog_last_message_sender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sender:"
         android:textColor="@color/gray"
-        android:textSize="15sp"
+        android:textSize="@dimen/dialog_sender_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/dialog_name"
         app:layout_constraintTop_toBottomOf="@id/dialog_name"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
-        android:id="@id/dialog_last_message"
+        android:id="@+id/dialog_last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="10dp"
         android:text="Last message"
         android:textColor="@color/gray"
-        android:textSize="15sp"
+        android:textSize="@dimen/dialog_message_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -71,12 +71,12 @@
         android:layout_marginRight="10dp"
         android:text="04:20"
         android:textColor="@color/gray"
-        android:textSize="12sp"
+        android:textSize="@dimen/dialog_date_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/dialog_name" />
 
     <TextView
-        android:id="@id/dialog_unread_count"
+        android:id="@+id/dialog_unread_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -88,7 +88,7 @@
         android:gravity="center"
         android:textColor="@color/color_placeholder"
         android:background="@drawable/drawable_oval"
-        android:textSize="12sp"
+        android:textSize="@dimen/dialog_unread_size"
         app:layout_constraintEnd_toEndOf="@+id/dialog_last_message_date"
         app:layout_constraintTop_toBottomOf="@+id/dialog_last_message_date" />
 
