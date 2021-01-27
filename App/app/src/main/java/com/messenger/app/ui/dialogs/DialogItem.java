@@ -9,6 +9,7 @@ public class DialogItem {
     private final static int MSG_MAX_LEN = 40;
     private final static int NAME_MAX_LEN = 22;
 
+    private Integer id;
     private String imageUri;
     private String name;
     private String lastSender;
@@ -17,6 +18,7 @@ public class DialogItem {
     private Integer unreadCount;
 
     public DialogItem(){
+        id = 0;
         imageUri = null;
         name = "Dialog Name";
         lastSender = "Last Sender";
@@ -25,7 +27,8 @@ public class DialogItem {
         unreadCount = 0;
     }
 
-    public DialogItem(String imageUri, String name, String lastMessage, String lastSender, String date, Integer unreadCount){
+    public DialogItem(Integer id, String imageUri, String name, String lastMessage, String lastSender, String date, Integer unreadCount){
+        this.id = id;
         this.imageUri = imageUri;
         this.name = name;
         this.lastMessage = lastMessage;
@@ -35,7 +38,15 @@ public class DialogItem {
     }
 
     public DialogItem(DialogItem di){
-        this(di.getImageUri(),di.getName(),di.getLastMessage(),di.getLastSender(),di.getDate(),di.getUnreadCount());
+        this(di.getId(), di.getImageUri(),di.getName(),di.getLastMessage(),di.getLastSender(),di.getDate(),di.getUnreadCount());
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getImageUri() {
@@ -68,12 +79,6 @@ public class DialogItem {
         else{
             return lastSender.substring(0,MSG_MAX_LEN-2).concat("... :");
         }
-    }
-
-    @NonNull
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new DialogItem(imageUri,name,lastMessage,lastSender,date,unreadCount);
     }
 
     public Integer getUnreadCount() {

@@ -16,5 +16,11 @@
     <dimen name="dialog_date_size">12sp</dimen>
     <dimen name="dialog_unread_size">12sp</dimen>
 
-    <dimen name="message_text_size">10sp</dimen>
+    <dimen name="chat_name_text_size">20sp</dimen>
+    <dimen name="chat_message_space">20dp</dimen>
+    <dimen name="message_sender_size">15sp</dimen>
+    <dimen name="message_date_size">12sp</dimen>
+    <dimen name="message_text_size">15sp</dimen>
+    <dimen name="message_input_height">50dp</dimen>
+    <dimen name="message_input_text_size">20sp</dimen>
 </resources>

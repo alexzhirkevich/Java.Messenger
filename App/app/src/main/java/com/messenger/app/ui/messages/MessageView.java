@@ -38,7 +38,7 @@ public class MessageView extends RelativeLayout {
     }
 
     private void init(Context context){
-        inflate(context, R.layout.item_message_incoming,this);
+        inflate(context, R.layout.item_message,this);
         incoming = true;
         avatar = findViewById(R.id.message_avatar);
         name = findViewById(R.id.message_sender);

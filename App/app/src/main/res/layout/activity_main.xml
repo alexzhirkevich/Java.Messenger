@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activities.MainActivity">
+        tools:context=".ui.activities.DialogsActivity">
 
         <!--    APPBAR      -->
         <com.google.android.material.appbar.AppBarLayout
@@ -92,7 +92,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        android:background="@color/color_placeholder"
+        android:background="@color/color_background_dark"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
+        app:menu="@menu/menu_drawer" />
 </androidx.drawerlayout.widget.DrawerLayout>

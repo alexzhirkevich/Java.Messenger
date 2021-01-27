@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.messenger.app.R;
+import com.messenger.app.util.MyGoogleUtils;
 
 public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageView {
 
@@ -44,8 +45,6 @@ public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageVie
 
     void init(Context context){
         circle = AppCompatResources.getDrawable(context, R.drawable.drawable_circle);
-        int p = (int)getResources().getDimension(R.dimen.avatar_padding);
-        setPadding(p,p,p,p);
     }
 
     public int dpToPx(int dp) {

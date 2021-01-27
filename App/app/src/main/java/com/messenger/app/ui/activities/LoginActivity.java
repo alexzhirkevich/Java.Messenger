@@ -4,12 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -20,8 +18,6 @@ import com.google.android.gms.tasks.Task;
 import com.messenger.app.R;
 import com.messenger.app.ui.AvatarImageView;
 import com.messenger.app.util.MyGoogleUtils;
-
-import java.util.Arrays;
 
 public class LoginActivity extends AppCompatActivity  {
 
@@ -42,12 +38,8 @@ public class LoginActivity extends AppCompatActivity  {
         btnGoogleSighIn = findViewById(R.id.btn_google_sign_in);
         btnGoogleSighIn.setOnClickListener(this::onGoogleSignIn);
         btnGoogleSighIn.setVisibility(View.INVISIBLE);
-
         avatar = findViewById(R.id.avatar);
-
-
         client = MyGoogleUtils.getGoogleSignInClient(this);
-
     }
 
     @Override
@@ -63,7 +55,7 @@ public class LoginActivity extends AppCompatActivity  {
 
     void setupAccount(GoogleSignInAccount account){
         MyGoogleUtils.setAccount(account);
-        startActivity(new Intent(this,MainActivity.class));
+        startActivity(new Intent(this, DialogsActivity.class));
         finish();
     }
 
@@ -74,7 +66,6 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
     private void hide() {
-        // Hide UI first
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();

@@ -17,7 +17,7 @@ public class User implements IUser{
     }
 
     public User(final User u){
-        this(u.getId(),u.getFirstName(),u.getLastName(),u.getImageUri());
+        this(u.getId(),u.getImageUri(), u.getFirstName(),u.getLastName());
     }
 
     @Override

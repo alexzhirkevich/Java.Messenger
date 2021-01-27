@@ -23,6 +23,7 @@ public class MyGoogleUtils {
 
     public static GoogleSignInClient getGoogleSignInClient(Activity activity){
         GoogleSignInOptions options= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("1")
                 .requestProfile()
                 .requestEmail()
                 .build();

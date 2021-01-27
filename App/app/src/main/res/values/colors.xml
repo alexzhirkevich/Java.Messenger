@@ -10,8 +10,12 @@
     <color name="app_back">#101010</color>
     <color name="avatar_border">@color/white</color>
     <color name="gray">#999999</color>
-    <color name="color_placeholder">#151515</color>
+    <color name="color_background_dark">#151515</color>
+    <color name="color_background">#252525</color>
     <color name="rippelColor">@color/color_primary_variant</color>
+
+    <color name="message_incoming">@color/color_background</color>
+    <color name="message_outcoming">@color/color_primary_variant</color>
 
     <color name="color_primary">#8B012C</color>
     <color name="color_primary_variant">#6c0121</color>

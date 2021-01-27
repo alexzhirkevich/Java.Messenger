@@ -137,6 +137,10 @@ public class DialogRecyclerAdapter
         return backup.get(idx);
     }
 
+    public DialogItem getVisible(int idx){
+        return dialogs.get(idx);
+    }
+
     public List<DialogItem> getAll(){
         if (searching)
             return new ArrayList<>(backup);
@@ -170,8 +174,8 @@ public class DialogRecyclerAdapter
     public class DialogViewHolder extends RecyclerView.ViewHolder
             implements RecyclerClickListener.OnItemClickListener {
 
+        private Integer id;
         private final AvatarImageView image;
-
         private final TextView name;
         private final TextView lastSender;
         private final TextView lastMessage;
@@ -189,6 +193,7 @@ public class DialogRecyclerAdapter
         }
 
         public void bind(DialogItem dialog){
+            id = dialog.getId();
             image.setImageURI(Uri.parse(dialog.getImageUri()));
             name.setText(dialog.getName());
             lastMessage.setText(dialog.getLastMessage());

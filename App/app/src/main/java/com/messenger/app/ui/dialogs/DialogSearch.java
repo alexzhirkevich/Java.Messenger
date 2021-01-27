@@ -14,12 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 
 import com.messenger.app.R;
+import com.messenger.app.util.KeyboardUtil;
 
 import java.util.List;
 
 public class DialogSearch extends AppCompatEditText {
 
     private DialogRecyclerView view = null;
+    private DialogRecyclerAdapter adapter;
 
     public DialogSearch(@NonNull Context context) {
         super(context);
@@ -38,6 +40,11 @@ public class DialogSearch extends AppCompatEditText {
 
     public void link(DialogRecyclerView view ){
         this.view = view;
+        this.adapter = view.getAdapter();
+    }
+
+    public boolean isVisible(){
+        return getVisibility() == VISIBLE;
     }
 
     public void hide(){
@@ -48,8 +55,8 @@ public class DialogSearch extends AppCompatEditText {
         }
         setText("");
         clearFocus();
-        if (view != null && view.getAdapter() != null) {
-            view.getAdapter().restoreVisibility();
+        if (adapter != null) {
+            adapter.restoreVisibility();
         }
     }
 
@@ -57,6 +64,9 @@ public class DialogSearch extends AppCompatEditText {
         if (getLayoutParams() != null) {
             getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
             requestLayout();
+        }
+        if (adapter != null) {
+            adapter.setVisible(adapter.getAll());
         }
         setVisibility(VISIBLE);
         setFocus();
@@ -82,18 +92,18 @@ public class DialogSearch extends AppCompatEditText {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (view != null && view.getAdapter() != null) {
+                if (adapter != null) {
                     if (charSequence.length() == 0) {
-                        view.getAdapter().restoreVisibility();
+                       adapter.restoreVisibility();
                     } else {
-                        List<DialogItem> visibleDialogs = view.getAdapter().getAll();
+                        List<DialogItem> visibleDialogs = adapter.getAll();
                         for (int j = 0; j < visibleDialogs.size(); j++) {
                             if (!visibleDialogs.get(j).getName().toLowerCase()
                                     .contains(charSequence.toString().toLowerCase().trim())) {
                                 visibleDialogs.remove(j--);
                             }
                         }
-                        view.getAdapter().setVisible(visibleDialogs);
+                        adapter.setVisible(visibleDialogs);
                         if (visibleDialogs.size() == 0){
                             setError(getResources().getString(R.string.error_notfound));
                         }
@@ -108,27 +118,13 @@ public class DialogSearch extends AppCompatEditText {
     }
 
     private void setFocus(){
-        if (getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS){
-            InputMethodManager inputMethodManager =
-                    (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (inputMethodManager != null){
-                inputMethodManager.toggleSoftInputFromWindow(
-                        getWindowToken(),InputMethodManager.SHOW_IMPLICIT, 0);
-            }
-        }
+        KeyboardUtil.showKeyboard(this);
         requestFocus();
     }
 
     @Override
     public void clearFocus() {
-        if (getResources().getConfiguration().keyboard == Configuration.KEYBOARD_NOKEYS){
-            InputMethodManager inputMethodManager =
-                    (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (inputMethodManager != null){
-                inputMethodManager.hideSoftInputFromWindow(
-                        getWindowToken(),0);
-            }
-        }
+        KeyboardUtil.hideKeyboard(this);
         super.clearFocus();
     }
 
