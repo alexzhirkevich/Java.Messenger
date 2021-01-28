@@ -24,7 +24,7 @@
             android:theme="@style/Theme.App.AppBarOverlay">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/dialogs_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
@@ -56,7 +56,7 @@
                     android:scrollbarSize="2dp"
                     android:scrollbarThumbVertical="@color/gray">
 
-                    <com.messenger.app.ui.dialogs.DialogRecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/dialog_list_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>

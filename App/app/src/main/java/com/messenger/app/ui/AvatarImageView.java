@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -20,6 +21,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.messenger.app.BuildConfig;
 import com.messenger.app.R;
 import com.messenger.app.util.MyGoogleUtils;
 
@@ -56,10 +58,11 @@ public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageVie
     @Override
     public void setImageURI(@Nullable Uri uri) {
         if (uri!=null) {
-            //Glide.with(this).load(uri).circleCrop().into(this);
             Glide.with(this).load(uri).circleCrop().addListener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    if (BuildConfig.DEBUG && e != null)
+                        e.printStackTrace();
                     return false;
                 }
 

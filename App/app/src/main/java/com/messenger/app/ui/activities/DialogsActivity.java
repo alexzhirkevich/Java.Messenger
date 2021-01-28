@@ -18,6 +18,8 @@ import androidx.core.view.GravityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,11 +29,12 @@ import com.messenger.app.ui.AvatarImageView;
 import com.messenger.app.ui.RecyclerClickListener;
 import com.messenger.app.ui.dialogs.DialogItem;
 import com.messenger.app.ui.dialogs.DialogRecyclerAdapter;
-import com.messenger.app.ui.dialogs.DialogRecyclerView;
 import com.messenger.app.ui.dialogs.DialogSearch;
 import com.messenger.app.util.MyGoogleUtils;
 import com.messenger.app.util.VibrateUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class DialogsActivity extends AppCompatActivity
@@ -40,7 +43,6 @@ public class DialogsActivity extends AppCompatActivity
 
     private static final String STR_DIALOGS = "dialogs";
 
-    private DialogsActivityViewModel viewModel;
     private DialogRecyclerAdapter adapter;
     private DrawerLayout drawerLayout;
     private DialogSearch search;
@@ -50,12 +52,12 @@ public class DialogsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
+        DialogsActivityViewModel viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
         viewModel.getDialogs().observe(this, list -> adapter.setAll(list));
 
-        final Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.dialogs_toolbar);
         final NavigationView navigationView = findViewById(R.id.nav_view);
-        final DialogRecyclerView dialogRecyclerView = findViewById(R.id.dialog_list_view);
+        final RecyclerView dialogRecyclerView = findViewById(R.id.dialog_list_view);
         final FloatingActionButton fab = findViewById(R.id.fab_dialogs);
         final NestedScrollView dialogScrollView = findViewById(R.id.dialog_scroll_view);
         search = findViewById(R.id.edit_search);
@@ -93,7 +95,9 @@ public class DialogsActivity extends AppCompatActivity
 
         /* Add item click listener for RecyclerView (this) */
         if (dialogRecyclerView != null) {
-            adapter = dialogRecyclerView.getAdapter();
+            dialogRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new DialogRecyclerAdapter();
+            dialogRecyclerView.setAdapter(adapter);
             dialogRecyclerView.addOnItemTouchListener(new RecyclerClickListener(this, dialogRecyclerView, this));
         }
 
@@ -134,13 +138,32 @@ public class DialogsActivity extends AppCompatActivity
 
         /* Link search field to RecyclerView */
         if (search != null && dialogRecyclerView != null) {
-            search.link(dialogRecyclerView);
+            search.link(adapter);
         }
 
         if (viewModel != null){
             viewModel.updateDialogs();
         }
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        search = findViewById(R.id.edit_search);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        RecyclerView recyclerView = findViewById(R.id.dialog_list_view);
+        adapter = new DialogRecyclerAdapter();
+        recyclerView.setAdapter(adapter);
+        search = findViewById(R.id.edit_search);
+        search.link(adapter);
+        adapter.addAll(savedInstanceState.getParcelableArrayList(STR_DIALOGS));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STR_DIALOGS,new ArrayList<>(adapter.getAll()));
     }
 
     @Override

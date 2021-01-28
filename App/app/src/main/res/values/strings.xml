@@ -19,6 +19,7 @@
     <string name="close">close</string>
     <string name="account">Account</string>
     <string name="message">Message</string>
+    <string name="photo">Photo</string>
     <string name="properties">Properties</string>
 
     <string name="error_notfound">There are no chats with that name</string>

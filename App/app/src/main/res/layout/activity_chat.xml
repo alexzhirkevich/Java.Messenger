@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/chat_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -63,10 +63,11 @@
         android:scrollbarSize="2dp"
         android:scrollbarThumbVertical="@color/gray">
 
-        <com.messenger.app.ui.messages.MessageRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/message_recycler_view"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
+            android:paddingTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </androidx.core.widget.NestedScrollView>

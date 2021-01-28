@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,9 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
-        <activity android:name=".ui.activities.ChatActivity"
-            android:theme="@style/Theme.App.NoActionBar"
-            android:label=""/>
+        <activity android:name=".ui.activities.FullscreenImageActivity"
+            android:label="@string/photo"/>
+        <activity
+            android:name=".ui.activities.ChatActivity"
+            android:label=""
+            android:theme="@style/Theme.App.NoActionBar" />
         <activity android:name=".ui.activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

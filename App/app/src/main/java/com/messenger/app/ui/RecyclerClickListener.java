@@ -1,15 +1,13 @@
 package com.messenger.app.ui;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.jetbrains.annotations.NotNull;
 
 public class RecyclerClickListener implements RecyclerView.OnItemTouchListener {
 
@@ -52,7 +50,7 @@ public class RecyclerClickListener implements RecyclerView.OnItemTouchListener {
     }
 
     @Override
-    public void onTouchEvent(@NotNull RecyclerView view, @NotNull MotionEvent e) { }
+    public void onTouchEvent(@NonNull RecyclerView view, @NonNull MotionEvent e) { }
 
     @Override
     public void onRequestDisallowInterceptTouchEvent (boolean disallowIntercept){}

@@ -1,10 +1,11 @@
 package com.messenger.app.ui.dialogs;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-public class DialogItem {
+public class DialogItem implements Parcelable {
 
     private final static int MSG_MAX_LEN = 40;
     private final static int NAME_MAX_LEN = 22;
@@ -12,8 +13,8 @@ public class DialogItem {
     private Integer id;
     private String imageUri;
     private String name;
-    private String lastSender;
     private String lastMessage;
+    private String lastSender;
     private String date;
     private Integer unreadCount;
 
@@ -40,6 +41,63 @@ public class DialogItem {
     public DialogItem(DialogItem di){
         this(di.getId(), di.getImageUri(),di.getName(),di.getLastMessage(),di.getLastSender(),di.getDate(),di.getUnreadCount());
     }
+
+
+    protected DialogItem(Parcel in) {
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readInt();
+        }
+        imageUri = in.readString();
+        name = in.readString();
+        lastMessage = in.readString();
+        lastSender = in.readString();
+        date = in.readString();
+        if (in.readByte() == 0) {
+            unreadCount = null;
+        } else {
+            unreadCount = in.readInt();
+        }
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(id);
+        }
+        dest.writeString(imageUri);
+        dest.writeString(name);
+        dest.writeString(lastMessage);
+        dest.writeString(lastSender);
+        dest.writeString(date);
+        if (unreadCount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(unreadCount);
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<DialogItem> CREATOR = new Creator<DialogItem>() {
+        @Override
+        public DialogItem createFromParcel(Parcel in) {
+            return new DialogItem(in);
+        }
+
+        @Override
+        public DialogItem[] newArray(int size) {
+            return new DialogItem[size];
+        }
+    };
 
     public Integer getId() {
         return id;
@@ -108,4 +166,5 @@ public class DialogItem {
     public void setUnreadCount(Integer unreadCount) {
         this.unreadCount = unreadCount;
     }
+
 }

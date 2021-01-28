@@ -3,13 +3,13 @@ package com.messenger.app.ui.messages;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -19,10 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.Resource;
-import com.messenger.app.R;;
-import com.messenger.app.data.model.Message;
+import com.messenger.app.R;
+import com.messenger.app.data.model.IMessage;
 import com.messenger.app.ui.AvatarImageView;
-import com.messenger.app.ui.RecyclerItemClickListener;
 import com.messenger.app.util.DateUtil;
 import com.messenger.app.util.MetrixUtil;
 
@@ -31,42 +30,33 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class MessageRecyclerAdapter
-        extends RecyclerView.Adapter<MessageRecyclerAdapter.MessageViewHolder> {
+public class MessageRecyclerAdapter2
+        extends RecyclerView.Adapter<MessageRecyclerAdapter2.MessageViewHolder> {
 
-    private final List<Message> messages = new ArrayList<>();
+    private final List<IMessage> messages = new ArrayList<>();
 
-    private RecyclerItemClickListener<Message> imageClickListener = null;
-    private RecyclerItemClickListener<Message> avatarClickListener = null;
-    private RecyclerItemClickListener<Message> nameClickListener = null;
-    private RecyclerItemClickListener<Message> onItemClickListener = null;
-
-
-    public void insert(int idx, Message item) {
+    public void insert(int idx, IMessage item) {
         messages.add(idx, item);
         notifyItemInserted(idx);
-    }
-
-    public int indexOf(Message item){
-        return messages.indexOf(item);
     }
 
     public int size() {
         return 0;
     }
 
-    public boolean add(Message item) {
+
+    public boolean add(IMessage item) {
         messages.add(item);
         notifyItemInserted(getItemCount() - 1);
         return false;
     }
 
-    public void set(int idx, Message item) {
+    public void set(int idx, IMessage item) {
         messages.set(idx, item);
         notifyItemChanged(idx);
     }
 
-    public boolean addAll(Collection<? extends Message> dialog) {
+    public boolean addAll(Collection<? extends IMessage> dialog) {
         int prev = getItemCount();
         messages.addAll(dialog);
         notifyItemRangeInserted(prev, dialog.size());
@@ -79,64 +69,24 @@ public class MessageRecyclerAdapter
         notifyItemRangeRemoved(0, l);
     }
 
-    public void remove(Message message) {
-        int idx = messages.indexOf(message);
-        if (idx != -1) {
-            messages.remove(idx);
-            notifyItemRemoved(idx);
-        }
-    }
-
     public void remove(int position) {
         messages.remove(position);
         notifyItemRemoved(position);
     }
 
-    public List<Message> getAll() {
-        return new ArrayList<>(messages);
-    }
-
-    public void setOnItemClickListener(RecyclerItemClickListener<Message> onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
-
-    public RecyclerItemClickListener<Message> getOnItemClickListener() {
-        return onItemClickListener;
-    }
-
-    public void setImageClickListener(RecyclerItemClickListener<Message> imageClickListener) {
-        this.imageClickListener = imageClickListener;
-    }
-
-    public RecyclerItemClickListener<Message> getImageClickListener() {
-        return imageClickListener;
-    }
-
-    public void setNameClickListener(RecyclerItemClickListener<Message> nameClickListener) {
-        this.nameClickListener = nameClickListener;
-    }
-
-    public RecyclerItemClickListener<Message> getNameClickListener() {
-        return nameClickListener;
-    }
-
-    public void setAvatarClickListener(RecyclerItemClickListener<Message> avatarClickListener) {
-        this.avatarClickListener = avatarClickListener;
-    }
-
-    public RecyclerItemClickListener<Message> getAvatarClickListener() {
-        return avatarClickListener;
-    }
-
-    public Message get(int idx){
+    public IMessage get(int idx){
         return messages.get(idx);
     }
 
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         final View root = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
+        final ImageView imageview = root.findViewById(R.id.message_image);
+        if (imageview != null) {
+            imageview.setOnClickListener(view ->
+                    Toast.makeText(view.getContext(), "Clicled", Toast.LENGTH_SHORT).show());
+        }
         return new MessageViewHolder(root);
     }
 
@@ -152,7 +102,7 @@ public class MessageRecyclerAdapter
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        private Message message;
+        private int id;
         private final AvatarImageView avatar;
         private final RelativeLayout msgData;
         private final TextView name;
@@ -160,79 +110,25 @@ public class MessageRecyclerAdapter
         private final ImageView image;
         private final TextView date;
 
-        private final int topMargin;
+        private String senderName;
+
+        private int topMargin;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
-            itemView.setClickable(true);
-            itemView.setLongClickable(true);
-            itemView.setOnClickListener(view -> {
-                if (onItemClickListener != null){
-                    onItemClickListener.onItemClick(view, message);
-                }
-            });
-            itemView.setOnLongClickListener(view ->{
-                if (onItemClickListener != null){
-                    onItemClickListener.onLongItemClick(view, message);
-                    return true;
-                }
-                return false;
-            });
             avatar = itemView.findViewById(R.id.message_avatar);
-            if (avatar != null){
-                avatar.setOnClickListener(view ->{
-                    if (avatarClickListener!=null){
-                        avatarClickListener.onItemClick(view, message);
-                    }
-                });
-                avatar.setOnLongClickListener(view ->{
-                    if (avatarClickListener!=null){
-                       avatarClickListener.onLongItemClick(view,message);
-                       return true;
-                    }
-                    return false;
-                });
-            }
             name = itemView.findViewById(R.id.message_sender);
-            if (name != null){
-                name.setOnClickListener(view ->{
-                    if (nameClickListener!=null){
-                        nameClickListener.onItemClick(view,message);
-                    }
-                });
-                name.setOnLongClickListener(view ->{
-                    if (nameClickListener!=null){
-                        nameClickListener.onLongItemClick(view,message);
-                        return true;
-                    }
-                    return false;
-                });
-            }
-            image = itemView.findViewById(R.id.message_image);
-            if (image != null){
-                image.setOnClickListener(view ->{
-                    if (imageClickListener!=null){
-                        imageClickListener.onItemClick(view,message);
-                    }
-                });
-                image.setOnLongClickListener(view ->{
-                    if (imageClickListener!=null){
-                        imageClickListener.onLongItemClick(view,message);
-                        return true;
-                    }
-                    return false;
-                });
-            }
             text = itemView.findViewById(R.id.message_text);
+            image = itemView.findViewById(R.id.message_image);
             date = itemView.findViewById(R.id.message_date);
             msgData = itemView.findViewById(R.id.message_data_layout);
             topMargin = MetrixUtil.dpToPx(itemView.getContext(), 10);
         }
 
-        private void bind(Message message) {
+        public void bind(IMessage message) {
 
-            this.message = message;
-            String senderName = message.getSender().getFullName();
+            id = message.getId();
+            senderName = message.getSender().getFullName();
 
             name.setText("");
             if (!message.isOutcoming() && !message.isPrivate()) {
@@ -247,7 +143,6 @@ public class MessageRecyclerAdapter
             if (message.getText() != null) {
                 text.setText(message.getText());
             }
-
             if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()){
                 Glide.with(image).load(message.getImageUrl()).transform(new Transformation<Bitmap>() {
                     @NonNull
@@ -255,11 +150,11 @@ public class MessageRecyclerAdapter
                     public Resource<Bitmap> transform(@NonNull Context context, @NonNull Resource<Bitmap> resource, int outWidth, int outHeight) {
                         double width = resource.get().getWidth();
                         double height = resource.get().getHeight();
-                        double scale = MetrixUtil.dpToPx(image.getContext(),300)/width;
+                        double scale = width / MetrixUtil.dpToPx(image.getContext(),300);
                         Bitmap scaled = Bitmap.createScaledBitmap(resource.get(),
-                                (int)(width*scale),
-                                (int)(height*scale),
-                                scale > 1);
+                                (int)(width/scale),
+                                (int)(height/scale),
+                                true);
                         return new Resource<Bitmap>() {
                             @NonNull
                             @Override
@@ -275,7 +170,7 @@ public class MessageRecyclerAdapter
 
                             @Override
                             public int getSize() {
-                                return scaled.getHeight()*scaled.getWidth();
+                               return scaled.getHeight()*scaled.getWidth();
                             }
 
                             @Override
@@ -294,7 +189,6 @@ public class MessageRecyclerAdapter
             }
             else{
                 image.setVisibility(View.INVISIBLE);
-                image.setImageDrawable(null);
             }
             if (message.getDate() != null) {
                 date.setText(DateUtil.getTime(message.getDate()));
@@ -303,7 +197,7 @@ public class MessageRecyclerAdapter
             transformLayoutParams(message);
         }
 
-        private void transformLayoutParams(Message message){
+        private void transformLayoutParams(IMessage message){
 
             RelativeLayout.LayoutParams dataParams = (RelativeLayout.LayoutParams) msgData.getLayoutParams();
             RelativeLayout.LayoutParams textParams = (RelativeLayout.LayoutParams) text.getLayoutParams();

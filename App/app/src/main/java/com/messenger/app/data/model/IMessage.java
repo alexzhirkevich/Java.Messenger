@@ -11,6 +11,9 @@ public interface IMessage {
     String getText();
     void setText(String text);
 
+    String getImageUrl();
+    void setImageUrl(String url);
+
     Date getDate();
     void setDate(Date date);
 

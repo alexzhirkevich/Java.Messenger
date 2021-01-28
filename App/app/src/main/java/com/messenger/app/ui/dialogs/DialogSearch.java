@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.messenger.app.R;
 import com.messenger.app.util.KeyboardUtil;
@@ -20,7 +21,6 @@ import java.util.List;
 
 public class DialogSearch extends AppCompatEditText {
 
-    private DialogRecyclerView view = null;
     private DialogRecyclerAdapter adapter;
 
     public DialogSearch(@NonNull Context context) {
@@ -38,9 +38,8 @@ public class DialogSearch extends AppCompatEditText {
         init(context);
     }
 
-    public void link(DialogRecyclerView view ){
-        this.view = view;
-        this.adapter = view.getAdapter();
+    public void link(DialogRecyclerAdapter adapter){
+        this.adapter = adapter;
     }
 
     public boolean isVisible(){
