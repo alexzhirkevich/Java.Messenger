@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    tools:context=".ui.dialogs.DialogItem"
+    tools:context=".data.model.Dialog"
     android:clickable="true"
     android:focusable="true">
 
-    <com.messenger.app.ui.AvatarImageView
+    <com.messenger.app.ui.common.AvatarImageView
         android:id="@+id/dialog_avatar"
         android:layout_width="70dp"
         android:layout_height="70dp"

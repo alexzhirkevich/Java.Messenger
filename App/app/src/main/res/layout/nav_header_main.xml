@@ -12,7 +12,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <com.messenger.app.ui.AvatarImageView
+    <com.messenger.app.ui.common.AvatarImageView
         android:id="@+id/image_drawer_avatar"
         android:layout_width="75dp"
         android:layout_height="75dp"

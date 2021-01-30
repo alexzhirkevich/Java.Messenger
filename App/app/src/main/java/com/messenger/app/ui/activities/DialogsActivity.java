@@ -25,16 +25,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.messenger.app.R;
-import com.messenger.app.ui.AvatarImageView;
-import com.messenger.app.ui.RecyclerClickListener;
-import com.messenger.app.ui.dialogs.DialogItem;
+import com.messenger.app.ui.common.AvatarImageView;
+import com.messenger.app.ui.common.RecyclerClickListener;
+import com.messenger.app.data.model.Dialog;
 import com.messenger.app.ui.dialogs.DialogRecyclerAdapter;
 import com.messenger.app.ui.dialogs.DialogSearch;
 import com.messenger.app.util.MyGoogleUtils;
 import com.messenger.app.util.VibrateUtil;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import java.util.Random;
 
 public class DialogsActivity extends AppCompatActivity
@@ -52,99 +52,16 @@ public class DialogsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DialogsActivityViewModel viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
-        viewModel.getDialogs().observe(this, list -> adapter.setAll(list));
-
-        final Toolbar toolbar = findViewById(R.id.dialogs_toolbar);
-        final NavigationView navigationView = findViewById(R.id.nav_view);
-        final RecyclerView dialogRecyclerView = findViewById(R.id.dialog_list_view);
-        final FloatingActionButton fab = findViewById(R.id.fab_dialogs);
-        final NestedScrollView dialogScrollView = findViewById(R.id.dialog_scroll_view);
-        search = findViewById(R.id.edit_search);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        /* Setup navigation drawer */
-        if (navigationView != null) {
-            final AvatarImageView drawerAvatar = navigationView.getHeaderView(0).findViewById(R.id.image_drawer_avatar);
-            final TextView email = navigationView.getHeaderView(0).findViewById(R.id.text_drawer_email);
-            final TextView name = navigationView.getHeaderView(0).findViewById(R.id.text_drawer_name);
-            GoogleSignInAccount account = MyGoogleUtils.getAccount();
-            if (account != null) {
-                if (drawerAvatar != null && account.getPhotoUrl() != null) {
-                    drawerAvatar.setImageURI(account.getPhotoUrl());
-                }
-                if (email != null && account.getEmail() != null) {
-                    email.setText(account.getEmail());
-                }
-                if (name != null && account.getDisplayName() != null) {
-                    name.setText(account.getDisplayName());
-                }
-            }
-        }
+        setupNavDrawer();
+        setupToolbar();
+        setupResyclerView();
+        setupFloatingButton();
 
-        /* Setup toolbar */
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_menu);
-            setSupportActionBar(toolbar);
-        }
-
-        /* Set navigation view itemSelectedListener */
-        if (navigationView != null) {
-            navigationView.setNavigationItemSelectedListener(this);
-        }
-
-        /* Add item click listener for RecyclerView (this) */
-        if (dialogRecyclerView != null) {
-            dialogRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            adapter = new DialogRecyclerAdapter();
-            dialogRecyclerView.setAdapter(adapter);
-            dialogRecyclerView.addOnItemTouchListener(new RecyclerClickListener(this, dialogRecyclerView, this));
-        }
-
-        /* Floating button on click action */
-        if (fab != null && adapter != null) {
-            fab.setOnClickListener(e -> {
-                if (search != null && search.isVisible())
-                    search.hide();
-                adapter.insert(0, new DialogItem(
-                        new Random().nextInt(1000),
-                        MyGoogleUtils.getAccount().getPhotoUrl().toString(),
-                        "Name",
-                        "Message",
-                        "Sender:",
-                        "13:37",
-                        3));
-            });
-        }
-
-        /* Add disappear animation to floating button when scrolling */
-        if (dialogScrollView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            dialogScrollView.setOnScrollChangeListener(
-                    (View.OnScrollChangeListener) (view, i, i1, i2, i3) -> {
-
-                        if (!dialogScrollView.canScrollVertically(-1))
-                            Toast.makeText(this,"Update",Toast.LENGTH_SHORT).show();
-
-                        if (adapter.size() > 10) {
-                            if (i1 < i3) {
-                                fab.show();
-                            } else {
-                                fab.hide();
-                            }
-                        } else
-                            fab.show();
-                    });
-        }
-
-        /* Link search field to RecyclerView */
-        if (search != null && dialogRecyclerView != null) {
-            search.link(adapter);
-        }
-
-        if (viewModel != null){
-            viewModel.updateDialogs();
-        }
-
+        DialogsActivityViewModel viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
+        viewModel.getDialogs().observe(this, list -> adapter.setAll(list));
+        viewModel.updateDialogs();
     }
 
     @Override
@@ -153,11 +70,14 @@ public class DialogsActivity extends AppCompatActivity
         search = findViewById(R.id.edit_search);
         drawerLayout = findViewById(R.id.drawer_layout);
         RecyclerView recyclerView = findViewById(R.id.dialog_list_view);
-        adapter = new DialogRecyclerAdapter();
-        recyclerView.setAdapter(adapter);
-        search = findViewById(R.id.edit_search);
-        search.link(adapter);
-        adapter.addAll(savedInstanceState.getParcelableArrayList(STR_DIALOGS));
+        if (recyclerView!=null) {
+            adapter = (DialogRecyclerAdapter) recyclerView.getAdapter();
+            search = findViewById(R.id.edit_search);
+            if (adapter != null && search != null) {
+                search.link(adapter);
+                adapter.addAll(savedInstanceState.getParcelableArrayList(STR_DIALOGS));
+            }
+        }
     }
 
     @Override
@@ -231,7 +151,7 @@ public class DialogsActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(View view, int position) {
-        DialogItem clicked = adapter.getVisible(position);
+        Dialog clicked = adapter.getVisible(position);
         ChatActivity.startActivity(this,clicked.getId(), clicked.getName(), clicked.getImageUri());
     }
 
@@ -250,4 +170,86 @@ public class DialogsActivity extends AppCompatActivity
         VibrateUtil.with(this).vibrate(20,VibrateUtil.POWER_LOW);
         pm.show();
     }
+
+    private void setupNavDrawer() {
+        final NavigationView navigationView = findViewById(R.id.nav_view);
+        if (navigationView != null) {
+            final AvatarImageView drawerAvatar = navigationView.getHeaderView(0).findViewById(R.id.image_drawer_avatar);
+            final TextView email = navigationView.getHeaderView(0).findViewById(R.id.text_drawer_email);
+            final TextView name = navigationView.getHeaderView(0).findViewById(R.id.text_drawer_name);
+            GoogleSignInAccount account = MyGoogleUtils.getAccount();
+            if (account != null) {
+                if (drawerAvatar != null && account.getPhotoUrl() != null) {
+                    drawerAvatar.setImageURI(account.getPhotoUrl());
+                }
+                if (email != null && account.getEmail() != null) {
+                    email.setText(account.getEmail());
+                }
+                if (name != null && account.getDisplayName() != null) {
+                    name.setText(account.getDisplayName());
+                }
+            }
+            navigationView.setNavigationItemSelectedListener(this);
+        }
+    }
+
+
+    private void setupToolbar() {
+        final Toolbar toolbar = findViewById(R.id.dialogs_toolbar);
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.ic_menu);
+            setSupportActionBar(toolbar);
+        }
+    }
+
+    private void setupResyclerView() {
+        final RecyclerView dialogRecyclerView = findViewById(R.id.dialog_list_view);
+        if (dialogRecyclerView != null) {
+            dialogRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new DialogRecyclerAdapter();
+            dialogRecyclerView.setAdapter(adapter);
+            dialogRecyclerView.addOnItemTouchListener(new RecyclerClickListener(this, dialogRecyclerView, this));
+        }
+        search = findViewById(R.id.edit_search);
+        if (search != null && dialogRecyclerView != null) {
+            search.link(adapter);
+        }
+    }
+    private void setupFloatingButton() {
+        final NestedScrollView dialogScrollView = findViewById(R.id.dialog_scroll_view);
+        final FloatingActionButton fab = findViewById(R.id.fab_dialogs);
+        /* Floating button on click action */
+        if (fab != null && adapter != null) {
+            fab.setOnClickListener(e -> {
+                if (search != null && search.isVisible())
+                    search.hide();
+                adapter.insert(0, new Dialog(
+                        new Random().nextInt(1000),
+                        MyGoogleUtils.getAccount().getPhotoUrl().toString(),
+                        "Name",
+                        "Message",
+                        "Sender:",
+                        new Date(),
+                        3));
+            });
+        }
+        if (dialogScrollView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            dialogScrollView.setOnScrollChangeListener(
+                    (View.OnScrollChangeListener) (view, i, i1, i2, i3) -> {
+
+                        if (!dialogScrollView.canScrollVertically(-1))
+                            Toast.makeText(this,"Update",Toast.LENGTH_SHORT).show();
+
+                        if (adapter.size() > 10) {
+                            if (i1 < i3) {
+                                fab.show();
+                            } else {
+                                fab.hide();
+                            }
+                        } else
+                            fab.show();
+                    });
+        }
+    }
+
 }

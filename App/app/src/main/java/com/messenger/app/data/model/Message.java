@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
+import com.messenger.protocol.MessageData;
+
 import java.util.Date;
 
 public class Message implements IMessage, Parcelable {
@@ -24,6 +26,19 @@ public class Message implements IMessage, Parcelable {
         this.imageUri = "";
         this.date = date;
         this.isPrivate = isPrivate;
+    }
+
+    public Message(final Message m){
+        this(m.id,m.sender,m.date);
+        setText(m.text);
+        setImageUrl(m.getImageUrl());
+        setDate(new Date(date.getTime()));
+    }
+
+    public Message(final MessageData md){
+        this(md.getId(), new User(md.getFrom()), md.getDate());
+        setText(md.getContent().getText());
+        setImageUrl(md.getContent().getImageUrl());
     }
 
     protected Message(Parcel in) {

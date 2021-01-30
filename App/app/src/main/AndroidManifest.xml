@@ -9,9 +9,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
         <activity android:name=".ui.activities.FullscreenImageActivity"
@@ -20,7 +20,8 @@
             android:name=".ui.activities.ChatActivity"
             android:label=""
             android:theme="@style/Theme.App.NoActionBar" />
-        <activity android:name=".ui.activities.LoginActivity">
+        <activity android:name=".ui.activities.LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

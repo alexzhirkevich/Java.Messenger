@@ -3,7 +3,6 @@ package com.messenger.app.ui.messages;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,8 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.Resource;
 import com.messenger.app.R;;
 import com.messenger.app.data.model.Message;
-import com.messenger.app.ui.AvatarImageView;
-import com.messenger.app.ui.RecyclerItemClickListener;
+import com.messenger.app.ui.common.AvatarImageView;
+import com.messenger.app.ui.common.RecyclerItemClickListener;
 import com.messenger.app.util.DateUtil;
 import com.messenger.app.util.MetrixUtil;
 

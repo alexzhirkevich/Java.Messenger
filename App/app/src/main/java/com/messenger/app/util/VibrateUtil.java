@@ -73,7 +73,7 @@ public class VibrateUtil {
     public VibrateUtil vibrate(int ms, int power){
         if (vibrator != null && vibrator.hasVibrator()){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                vibrator.vibrate(VibrationEffect.createWaveform(new long[]{power*10},new int[]{ms},-1));
+                vibrator.vibrate(VibrationEffect.createWaveform(new long[]{ms},new int[]{power*10},-1));
             }else
                 vibrator.vibrate(ms);
         }

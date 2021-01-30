@@ -10,24 +10,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.messenger.app.R;
-import com.messenger.app.ui.AvatarImageView;
-import com.messenger.app.ui.RecyclerClickListener;
+import com.messenger.app.data.model.Dialog;
+import com.messenger.app.ui.common.AvatarImageView;
+import com.messenger.app.ui.common.RecyclerClickListener;
+import com.messenger.app.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class DialogRecyclerAdapter
         extends RecyclerView.Adapter<DialogRecyclerAdapter.DialogViewHolder> {
 
-    private List<DialogItem> dialogs = new ArrayList<>();
-    private List<DialogItem> backup = null;
+    private List<Dialog> dialogs = new ArrayList<>();
+    private List<Dialog> backup = null;
     private boolean searching = false;
 
     RecyclerClickListener.OnItemClickListener clickListener;
 
-    public boolean insert(int idx, DialogItem item){
+    public boolean insert(int idx, Dialog item){
         if (item != null) {
             if (!searching) {
                 dialogs.add(idx, item);
@@ -46,7 +47,7 @@ public class DialogRecyclerAdapter
         return backup.size();
     }
 
-    public boolean add(DialogItem item){
+    public boolean add(Dialog item){
         if (item != null) {
             if (!searching) {
                 dialogs.add(item);
@@ -59,7 +60,7 @@ public class DialogRecyclerAdapter
         return false;
     }
 
-    public boolean set(int idx, DialogItem item){
+    public boolean set(int idx, Dialog item){
         if (item != null) {
             if (!searching) {
                 dialogs.set(idx, item);
@@ -72,7 +73,7 @@ public class DialogRecyclerAdapter
         return false;
     }
 
-    public boolean addAll(Collection<? extends DialogItem> dialog) {
+    public boolean addAll(Collection<? extends Dialog> dialog) {
         if (dialog != null) {
             if (!searching) {
                 int prev = getItemCount();
@@ -86,7 +87,7 @@ public class DialogRecyclerAdapter
         return false;
     }
 
-    public boolean setAll(Collection<? extends DialogItem> dialog) {
+    public boolean setAll(Collection<? extends Dialog> dialog) {
         if (dialog != null) {
             dialogs.clear();
             dialogs.addAll(dialog);
@@ -96,7 +97,7 @@ public class DialogRecyclerAdapter
         return false;
     }
 
-    public void setVisible(Collection<? extends DialogItem> dialog){
+    public void setVisible(Collection<? extends Dialog> dialog){
         if (dialog  != null) {
             if (!searching) {
                 searching = true;
@@ -130,18 +131,18 @@ public class DialogRecyclerAdapter
         notifyItemRemoved(position);
     }
 
-    public DialogItem get(int idx){
+    public Dialog get(int idx){
         if (!searching) {
             return dialogs.get(idx);
         }
         return backup.get(idx);
     }
 
-    public DialogItem getVisible(int idx){
+    public Dialog getVisible(int idx){
         return dialogs.get(idx);
     }
 
-    public List<DialogItem> getAll(){
+    public List<Dialog> getAll(){
         if (searching)
             return new ArrayList<>(backup);
         else
@@ -192,13 +193,13 @@ public class DialogRecyclerAdapter
             unread = itemView.findViewById(R.id.dialog_unread_count);
         }
 
-        public void bind(DialogItem dialog){
+        public void bind(Dialog dialog){
             id = dialog.getId();
             image.setImageURI(Uri.parse(dialog.getImageUri()));
             name.setText(dialog.getName());
             lastMessage.setText(dialog.getLastMessage());
             lastSender.setText(dialog.getLastSender());
-            date.setText(dialog.getDate());
+            date.setText(DateUtil.getTime(dialog.getDate()));
             unread.setText(dialog.getUnreadCount().toString());
             unread.setVisibility(dialog.getUnreadCount() <=0? View.INVISIBLE:View.VISIBLE);
         }

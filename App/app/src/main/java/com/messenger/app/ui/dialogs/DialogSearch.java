@@ -1,20 +1,18 @@
 package com.messenger.app.ui.dialogs;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.messenger.app.R;
+import com.messenger.app.data.model.Dialog;
 import com.messenger.app.util.KeyboardUtil;
 
 import java.util.List;
@@ -95,7 +93,7 @@ public class DialogSearch extends AppCompatEditText {
                     if (charSequence.length() == 0) {
                        adapter.restoreVisibility();
                     } else {
-                        List<DialogItem> visibleDialogs = adapter.getAll();
+                        List<Dialog> visibleDialogs = adapter.getAll();
                         for (int j = 0; j < visibleDialogs.size(); j++) {
                             if (!visibleDialogs.get(j).getName().toLowerCase()
                                     .contains(charSequence.toString().toLowerCase().trim())) {

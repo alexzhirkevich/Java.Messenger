@@ -6,6 +6,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.messenger.app.R;
 
 public class MyGoogleUtils {
 
@@ -23,7 +24,7 @@ public class MyGoogleUtils {
 
     public static GoogleSignInClient getGoogleSignInClient(Activity activity){
         GoogleSignInOptions options= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("1")
+                .requestIdToken(activity.getString(R.string.google_oauth_id))
                 .requestProfile()
                 .requestEmail()
                 .build();

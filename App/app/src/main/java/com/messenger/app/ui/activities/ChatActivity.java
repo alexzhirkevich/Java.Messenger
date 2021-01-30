@@ -24,11 +24,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.messenger.app.R;
-import com.messenger.app.data.model.IMessage;
 import com.messenger.app.data.model.Message;
 import com.messenger.app.data.model.User;
-import com.messenger.app.ui.AvatarImageView;
-import com.messenger.app.ui.RecyclerItemClickListener;
+import com.messenger.app.ui.common.AvatarImageView;
+import com.messenger.app.ui.common.RecyclerItemClickListener;
 import com.messenger.app.ui.messages.MessageInput;
 import com.messenger.app.ui.messages.MessageRecyclerAdapter;
 import com.messenger.app.util.MyGoogleUtils;
@@ -37,59 +36,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-public class ChatActivity extends AppCompatActivity
-    implements MessageInput.OnSendListener, MessageInput.OnAttachListener, PopupMenu.OnMenuItemClickListener{
+public class    ChatActivity extends AppCompatActivity
+    implements MessageInput.OnSendListener, MessageInput.OnAttachListener, PopupMenu.OnMenuItemClickListener {
 
-    public static final String STR_MESSAGES = "messages";
-    public static final String EXTRA_CHAT_ID = "EXTRA_CHAT_ID";
-    public static final String EXTRA_CHAT_NAME = "EXTRA_CHAT_NAME";
-    public static final String EXTRA_CHAT_AVATAR = "EXTRA_CHAT_AVATAR";
+    private static final String STR_MESSAGES = "messages";
+    private static final String EXTRA_CHAT_ID = "EXTRA_CHAT_ID";
+    private static final String EXTRA_CHAT_NAME = "EXTRA_CHAT_NAME";
+    private static final String EXTRA_CHAT_AVATAR = "EXTRA_CHAT_AVATAR";
     private static final int SELECT_PHOTO = 1001;
 
     private RecyclerView mRecyclerView;
     private MessageRecyclerAdapter adapter;
     private NestedScrollView scrollView;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-
-        final Integer chatId = getIntent().getIntExtra(EXTRA_CHAT_ID, -1);
-        final String chatName = getIntent().getStringExtra(EXTRA_CHAT_NAME);
-        final String avatarUrl = getIntent().getStringExtra(EXTRA_CHAT_AVATAR);
-
-        final TextView tvChatName = findViewById(R.id.chat_name);
-        final AvatarImageView ivChatAvatar = findViewById(R.id.chat_avatar);
-        scrollView = findViewById(R.id.message_scroll);
-
-        setupMessageInput();
-        setupRecyclerView();
-
-        if (tvChatName != null && chatName != null) {
-            tvChatName.setText(chatName);
-        }
-        if (ivChatAvatar != null && avatarUrl != null) {
-            ivChatAvatar.setImageURI(Uri.parse(avatarUrl));
-        }
-
-        Toolbar toolbar = findViewById(R.id.chat_toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-        }
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setHomeButtonEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-        ChatActivityViewModel viewModel = new ViewModelProvider(this).get(ChatActivityViewModel.class);
-        viewModel.setChatId(chatId);
-        viewModel.getMessages().observe(this, list -> {
-            adapter.addAll(list);
-        });
-
-        viewModel.updateChat();
-    }
 
     public static void startActivity(Context context, Integer chatID, String chatName, String chatAvatar) {
         Intent intent = new Intent(context, ChatActivity.class);
@@ -97,6 +55,23 @@ public class ChatActivity extends AppCompatActivity
         intent.putExtra(EXTRA_CHAT_NAME, chatName);
         intent.putExtra(EXTRA_CHAT_AVATAR, chatAvatar);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
+
+        scrollView = findViewById(R.id.message_scroll);
+
+        setupRecyclerView();
+        setupInput();
+        setupToolbar();
+
+        ChatActivityViewModel viewModel = new ViewModelProvider(this).get(ChatActivityViewModel.class);
+        viewModel.setChatId(getIntent().getIntExtra(EXTRA_CHAT_ID, -1));
+        viewModel.getMessages().observe(this, list -> adapter.addAll(list));
+        viewModel.updateChat();
     }
 
     @Override
@@ -157,7 +132,7 @@ public class ChatActivity extends AppCompatActivity
         }
     }
 
-    private void scrollToBottom(int delay){
+    private void scrollToBottom(int delay) {
         new Thread(() -> {
             try {
                 Thread.sleep(delay);
@@ -184,13 +159,13 @@ public class ChatActivity extends AppCompatActivity
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         scrollView = findViewById(R.id.message_scroll);
-        setupRecyclerView();
-        setupMessageInput();
+        mRecyclerView = findViewById(R.id.message_recycler_view);
+        adapter = (MessageRecyclerAdapter)mRecyclerView.getAdapter();
         adapter.addAll(savedInstanceState.getParcelableArrayList(STR_MESSAGES));
     }
 
-    private RecyclerItemClickListener<Message> newItemClickListener(){
-        return  new RecyclerItemClickListener<Message>() {
+    private RecyclerItemClickListener<Message> newItemClickListener() {
+        return new RecyclerItemClickListener<Message>() {
             @Override
             public boolean onLongItemClick(View view, Message message) {
                 PopupMenu pm = new PopupMenu(ChatActivity.this, view);
@@ -220,31 +195,54 @@ public class ChatActivity extends AppCompatActivity
         };
     }
 
-    private void setupMessageInput(){
-        final MessageInput input = findViewById(R.id.message_input);
-        input.setOnSendListener(this);
-        input.setOnAttachListener(this);
-    }
-
-    private void setupRecyclerView(){
+    private void setupRecyclerView() {
         mRecyclerView = findViewById(R.id.message_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MessageRecyclerAdapter();
         mRecyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(newItemClickListener());
-
         adapter.setImageClickListener(new RecyclerItemClickListener<Message>() {
             @Override
             public void onItemClick(View view, Message data) {
-                FullscreenImageActivity.startActivity(ChatActivity.this,data.getImageUrl());
+                FullscreenImageActivity.startActivity(ChatActivity.this, data.getImageUrl());
             }
 
             @Override
             public boolean onLongItemClick(View view, Message data) {
                 return newItemClickListener().onLongItemClick(
-                        mRecyclerView.getChildAt(adapter.indexOf(data)),data);
+                        mRecyclerView.getChildAt(adapter.indexOf(data)), data);
             }
         });
+    }
+
+    private void setupInput() {
+        final MessageInput input = findViewById(R.id.message_input);
+        input.setOnSendListener(this);
+        input.setOnAttachListener(this);
+    }
+
+    private void setupToolbar() {
+        final String avatarUrl = getIntent().getStringExtra(EXTRA_CHAT_AVATAR);
+        final String chatName = getIntent().getStringExtra(EXTRA_CHAT_NAME);
+
+        final AvatarImageView ivChatAvatar = findViewById(R.id.chat_avatar);
+        final TextView tvChatName = findViewById(R.id.chat_name);
+
+        if (tvChatName != null && chatName != null) {
+            tvChatName.setText(chatName);
+        }
+        if (ivChatAvatar != null && avatarUrl != null) {
+            ivChatAvatar.setImageURI(Uri.parse(avatarUrl));
+        }
+
+        Toolbar toolbar = findViewById(R.id.chat_toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setHomeButtonEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 }

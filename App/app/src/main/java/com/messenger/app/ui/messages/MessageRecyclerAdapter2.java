@@ -21,7 +21,7 @@ import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.Resource;
 import com.messenger.app.R;
 import com.messenger.app.data.model.IMessage;
-import com.messenger.app.ui.AvatarImageView;
+import com.messenger.app.ui.common.AvatarImageView;
 import com.messenger.app.util.DateUtil;
 import com.messenger.app.util.MetrixUtil;
 

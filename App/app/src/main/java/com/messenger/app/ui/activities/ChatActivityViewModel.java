@@ -1,15 +1,11 @@
 package com.messenger.app.ui.activities;
 
-import android.app.ActionBar;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.messenger.app.data.model.IMessage;
 import com.messenger.app.data.model.Message;
 import com.messenger.app.data.model.User;
-import com.messenger.app.ui.dialogs.DialogItem;
 import com.messenger.app.util.MyGoogleUtils;
 
 import java.util.ArrayList;
@@ -115,6 +111,17 @@ public class ChatActivityViewModel extends ViewModel {
         m.setPrivate(true);
         m.setOutcoming(true);
         msgs.add(m);
+
+        m = new Message(
+                new Random().nextInt(10000),
+                new User(5, null, "Name", null),
+                new Date());
+        m.setText("This is low res image message");
+        m.setImageUrl("https://img.discogs.com/JqG56oJHTwrj533239IjX6QC3no=/fit-in/300x300/filters:strip_icc():format(jpeg):mode_rgb():quality(40)/discogs-images/L-4437-1315454255.jpeg.jpg");
+        m.setPrivate(true);
+        m.setOutcoming(true);
+        msgs.add(m);
+
 
         messages.setValue(msgs);
     }

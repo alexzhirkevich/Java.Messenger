@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_oauth_id">215159501136-urdib24qk6kf88l7j18idpiqhb34ahfo.apps.googleusercontent.com</string>
     <string name="app_name">App</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -22,7 +23,33 @@
     <string name="photo">Photo</string>
     <string name="properties">Properties</string>
 
+    <string name="easter_1">Don\'t click on me. Nothing will happen…</string>
+    <string name="easter_2">I\'m not joking bro. Stop this</string>
+    <string name="easter_3">I\'m just a logo with a ripple effect…</string>
+    <string name="easter_4">OK. You can click as much as you want</string>
+    <string name="easter_5">Oops.</string>
+    <string name="easter_6">Oh, you\'re stubborn</string>
+    <string name="easter_7">Here we go!</string>
+    <string name="easter_8">What an accurate finger…</string>
+    <string name="easter_9">BOO!!!</string>
+    <string name="easter_10">Congrats with your 100 click!</string>
+    <string name="easter_11">May be it\'s time to stop?</string>
+    <string name="easter_12">OK. Do you like kitties?</string>
+    <string name="easter_kitties">OK. Do you like kitties?</string>
+    <string name="yes">Yes!</string>
+    <string name="easter_yes">Yes, but red</string>
+    <string name="easter_13">I knew it. This is for your</string>
+    <string name="easter_14">150 click! You won a prize. Login to get it</string>
+    <string name="easter_15">The game is really over =) All other clicks will redirect you to login procedure. Bye!</string>
+
+
     <string name="error_notfound">There are no chats with that name</string>
+    <string name="error_load_dialogs">Failed to get dialogs. Check your Internet connection.</string>
+    <string name="error_load_dialog">Failed to get chat info. Check your Internet connection.</string>
+    <string name="error_send_message">Failed to send message. Check your Internet connection.</string>
+    <string name="error_google_connecting">Cannot connect to google services</string>
+    <string name="error_server">Server error</string>
+
 
 </resources>
 
