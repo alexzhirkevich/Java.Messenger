@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.ChatActivity"
+    tools:context="com.alexz.messenger.app.ui.activities.ChatActivity"
     android:background="@color/color_background_dark">
 
     <!--    TOOLBAR     -->
@@ -12,79 +13,68 @@
         android:id="@+id/layout_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.App.AppBarOverlay"
-        android:layout_alignParentTop="true">
+        android:theme="@style/Theme.App.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/chat_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:menu="@menu/menu_chat"
             style="@style/Toolbar"
             app:popupTheme="@style/Theme.App.PopupOverlay">
 
-            <com.messenger.app.ui.common.AvatarImageView
+            <com.alexz.messenger.app.ui.common.AvatarImageView
                 android:id="@+id/chat_avatar"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:scaleType="centerInside"
                 android:padding="1dp"
-                android:src="@drawable/ic_search"
+                android:src="@drawable/logo256"
                 android:layout_gravity="center_vertical"/>
             <TextView
                 android:id="@+id/chat_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="5dp"
                 android:paddingStart="5dp"
-                android:paddingRight="10dp"
                 android:paddingEnd="10dp"
                 android:text="Chat Name"
                 android:textColor="@color/white"
                 android:gravity="center_vertical"
                 android:layout_gravity="center_vertical"
-                android:textSize="@dimen/chat_name_text_size" />
+                android:textSize="@dimen/chat_name_text_size"
+                tools:ignore="HardcodedText" />
 
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
-    <!--    INPUT     -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/message_scroll"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/message_recycler_view"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/chat_separator"
-        android:layout_below="@+id/layout_appbar"
+        android:layout_height="0dp"
         android:scrollbars="vertical"
-        android:scrollbarStyle="insideOverlay"
+        android:scrollbarStyle="outsideOverlay"
         android:fadeScrollbars="true"
         android:scrollbarSize="2dp"
-        android:scrollbarThumbVertical="@color/gray">
+        android:scrollbarThumbVertical="@color/gray"
+        android:layout_weight="1"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/message_recycler_view"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="10dp"
+        <View
+            android:id="@+id/chat_separator"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </androidx.core.widget.NestedScrollView>
+            android:layout_height="1px"
+            android:background="@color/gray"/>
 
-    <View
-        android:id="@+id/chat_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:layout_above="@id/message_input"
-        android:background="@color/gray"/>
-
-    <com.messenger.app.ui.messages.MessageInput
+        <!--    INPUT     -->
+    <com.alexz.messenger.app.ui.messages.MessageInput
         android:background="@color/color_background"
         android:id="@+id/message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+
         android:paddingBottom="5dp"/>
 
-</RelativeLayout>
+</LinearLayout>

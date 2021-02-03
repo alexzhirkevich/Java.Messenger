@@ -3,51 +3,48 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/message_input_height">
+    android:layout_height="wrap_content">
 
     <ImageButton
         android:id="@+id/button_message_attach"
         android:background="@android:color/transparent"
         android:layout_width="@dimen/message_input_height"
         android:layout_height="@dimen/message_input_height"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="bottom"
         android:src="@drawable/ic_attach"
         android:padding="10dp"
         android:scaleType="centerCrop"
         android:tint="?attr/colorPrimary"
         android:layout_marginStart="5dp" />
 
+
     <EditText
         android:id="@+id/edit_message_input"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
         android:hint="@string/message"
         android:inputType="textMultiLine|textCapSentences"
-        android:lines="8"
-        android:background="@android:color/transparent"
-        android:textSize="@dimen/message_input_text_size"
-        android:scrollbars="vertical"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
-        android:layout_weight="1"
+        android:maxLines="4"
         android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"/>
 
+        android:paddingEnd="10dp"
+        android:scrollbars="vertical"
+        android:textSize="@dimen/message_input_text_size" />
 
     <ImageButton
         android:id="@+id/button_message_send"
-        android:background="@android:color/transparent"
         android:layout_width="@dimen/message_input_height"
         android:layout_height="@dimen/message_input_height"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_send"
+        android:layout_gravity="bottom"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/transparent"
         android:padding="10dp"
         android:scaleType="centerCrop"
-        android:tint="?attr/colorPrimary"
-        android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp" />
+        android:src="@drawable/ic_send"
+        android:tint="?attr/colorPrimary" />
 
 
 </LinearLayout>

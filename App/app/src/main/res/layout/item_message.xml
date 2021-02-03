@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/chat_message_space">
 
-    <com.messenger.app.ui.common.AvatarImageView
+    <com.alexz.messenger.app.ui.common.AvatarImageView
         android:id="@+id/message_avatar"
         android:padding="1dp"
         android:layout_width="40dp"
@@ -36,7 +36,7 @@
             android:layout_alignParentTop="true"
             android:background="@android:color/transparent"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
+            android:paddingEnd="15dp"
             android:clickable="true"
             android:focusable="true"
             android:longClickable="true"

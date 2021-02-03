@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <item name="button_new_chat" type="id" />
+    <item name="button_find_chat" type="id" />
 </resources>

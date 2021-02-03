@@ -21,4 +21,5 @@
 
     <color name="color_primary">#8B012C</color>
     <color name="color_primary_variant">#6c0121</color>
+    <color name="ic_logo_background">#FFFFFF</color>
 </resources>
