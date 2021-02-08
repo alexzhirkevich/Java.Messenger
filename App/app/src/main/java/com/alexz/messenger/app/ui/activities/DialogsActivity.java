@@ -1,9 +1,9 @@
 package com.alexz.messenger.app.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,35 +13,34 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alexz.messenger.app.data.model.Chat;
 import com.alexz.messenger.app.ui.chats.DialogRecyclerAdapter;
+import com.alexz.messenger.app.ui.chats.DialogSearch;
+import com.alexz.messenger.app.ui.common.AvatarImageView;
+import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
 import com.alexz.messenger.app.ui.dialogwindows.AddChatDialog;
 import com.alexz.messenger.app.ui.viewmodels.DialogsActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
-import com.alexz.messenger.app.util.VibrateUtil;
-import com.alexz.messenger.app.ui.chats.DialogSearch;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.messenger.app.R;
-import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.RecyclerClickListener;
-import com.alexz.messenger.app.data.model.Chat;
 
-public class DialogsActivity extends AppCompatActivity
+public class DialogsActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-                    RecyclerClickListener.OnItemClickListener{
+        RecyclerItemClickListener<Chat> {
 
     private static final String STR_DIALOGS = "dialogs";
     private static final String STR_RECYCLER_DATA = "recyclerview_data";
@@ -52,6 +51,7 @@ public class DialogsActivity extends AppCompatActivity
     private DatabaseReference ref  = FirebaseDatabase.getInstance().getReference().child(FirebaseUtil.CHATS);
     private DialogsActivityViewModel viewModel;
     private RecyclerView dialogRecyclerView;
+    private AddChatDialog addChatDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +61,14 @@ public class DialogsActivity extends AppCompatActivity
         setupRecyclerView();
         viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
         viewModel.getChats().observe(this, list -> adapter.setAll(list));
-        viewModel.setOnline(true);
 
         final ProgressBar loadingPb = findViewById(R.id.dialog_loading_pb);
         if (loadingPb!=null){
             viewModel.getEndLoadingObservable().observe(this, (Void) ->{
                 loadingPb.setVisibility(View.INVISIBLE);
+            });
+            viewModel.getStartLoadingObservable().observe(this, (Void) ->{
+                loadingPb.setVisibility(View.VISIBLE);
             });
         }
 
@@ -78,23 +80,24 @@ public class DialogsActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
-        if (recManager != null) {
-            outState.putParcelable(STR_RECYCLER_DATA, recManager.onSaveInstanceState());
-        }
+//        RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
+//        if (recManager != null) {
+//            outState.putParcelable(STR_RECYCLER_DATA, recManager.onSaveInstanceState());
+//        }
 
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        setupRecyclerView();
-        if (dialogRecyclerView != null) {
-            RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
-            if (recManager != null) {
-                recManager.onRestoreInstanceState(savedInstanceState);
-            }
-        }
+        adapter = new DialogRecyclerAdapter();
+        dialogRecyclerView.setAdapter(adapter);
+//        if (dialogRecyclerView != null) {
+//            RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
+//            if (recManager != null) {
+//                recManager.onRestoreInstanceState(savedInstanceState);
+//            }
+//        }
     }
 
     @Override
@@ -136,10 +139,10 @@ public class DialogsActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_settings:
-                SettingsActivity.startActivity(this);
-                break;
+            case R.id.nav_account:
             case R.id.nav_about:
-                Toast.makeText(this,"About",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Coming soon",Toast.LENGTH_SHORT).show();
+                //SettingsActivity.startActivity(this);
                 break;
         }
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -168,25 +171,24 @@ public class DialogsActivity extends AppCompatActivity
 
 
     @Override
-    public void onItemClick(View view, int position) {
-        Chat clicked = adapter.get(position);
-        ChatActivity.startActivity(this,clicked.getId());
+    public void onItemClick(View view, Chat chat) {
+        ChatActivity.startActivity(this,chat.getId());
     }
 
     @Override
-    public void onLongItemClick(View view, int position) {
+    public boolean onLongItemClick(View view, Chat chat) {
         PopupMenu pm = new PopupMenu(this,view);
         pm.setGravity(Gravity.RIGHT);
         pm.inflate(R.menu.menu_dialogs);
         pm.setOnMenuItemClickListener(e ->{
             if (e.getItemId() == R.id.message_delete){
-                viewModel.removeChat(adapter.get(position));
+                viewModel.removeChat(chat);
                 return true;
             }
             return false;
         });
-        VibrateUtil.with(this).vibrate(20,VibrateUtil.POWER_LOW);
         pm.show();
+        return true;
     }
 
     private void setupNavDrawer() {
@@ -209,12 +211,19 @@ public class DialogsActivity extends AppCompatActivity
         }
     }
 
-
     private void setupToolbar() {
         final Toolbar toolbar = findViewById(R.id.dialogs_toolbar);
         if (toolbar != null) {
             toolbar.setNavigationIcon(R.drawable.ic_menu);
             setSupportActionBar(toolbar);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == AddChatDialog.REQ_NEW_CHAT_PHOTO && addChatDialog != null){
+            addChatDialog.onDialogResult(requestCode,resultCode,data);
         }
     }
 
@@ -225,7 +234,7 @@ public class DialogsActivity extends AppCompatActivity
             dialogRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             adapter = new DialogRecyclerAdapter();
             dialogRecyclerView.setAdapter(adapter);
-            dialogRecyclerView.addOnItemTouchListener(new RecyclerClickListener(this, dialogRecyclerView, this));
+            adapter.setOnItemClickListener(this);
         }
         search = findViewById(R.id.edit_search);
         if (search != null && dialogRecyclerView != null) {
@@ -237,12 +246,13 @@ public class DialogsActivity extends AppCompatActivity
 
         if (fab != null && adapter != null) {
             fab.setOnClickListener(e -> {
-                new AddChatDialog(DialogsActivity.this).show();
+                addChatDialog = new AddChatDialog(DialogsActivity.this);
+                addChatDialog.show();
             });
         }
         if (dialogRecyclerView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             dialogRecyclerView.setOnScrollChangeListener(
-                    (View.OnScrollChangeListener) (view, i, i1, i2, i3) -> {
+                    (view, i, i1, i2, i3) -> {
 
                         if (adapter.getItemCount() > 10) {
                             if (i1 < i3) {

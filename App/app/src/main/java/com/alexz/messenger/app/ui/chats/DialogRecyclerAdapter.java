@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexz.messenger.app.data.model.Chat;
+import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
 import com.alexz.messenger.app.util.DateUtil;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.messenger.app.R;
@@ -28,7 +29,7 @@ public class DialogRecyclerAdapter
     private List<Chat> backup = null;
     private boolean searching = false;
 
-    RecyclerClickListener.OnItemClickListener clickListener;
+    private RecyclerItemClickListener<Chat> clickListener;
 
     public boolean insert(int idx, Chat item){
         if (item != null) {
@@ -110,7 +111,9 @@ public class DialogRecyclerAdapter
                 searching = true;
                 backup = new ArrayList<>(chats);
             }
-            setAll(dialog);
+            chats.clear();;
+            chats.addAll(dialog);
+            notifyDataSetChanged();
         }
     }
 
@@ -173,14 +176,14 @@ public class DialogRecyclerAdapter
         return chats.size();
     }
 
-    public void setOnItemClickListener(RecyclerClickListener.OnItemClickListener listener){
+    public void setOnItemClickListener(RecyclerItemClickListener listener){
         this.clickListener = listener;
     }
 
 
-    public class DialogViewHolder extends RecyclerView.ViewHolder
-            implements RecyclerClickListener.OnItemClickListener {
+    public class DialogViewHolder extends RecyclerView.ViewHolder {
 
+        private Chat chat;
         private String id;
         private final AvatarImageView image;
         private final TextView name;
@@ -198,11 +201,29 @@ public class DialogRecyclerAdapter
             date = itemView.findViewById(R.id.dialog_last_message_date);
             unread = itemView.findViewById(R.id.dialog_unread_count);
             unread.setVisibility(View.INVISIBLE);
+
+            itemView.setOnClickListener(view ->{
+                if (clickListener != null){
+                    clickListener.onItemClick(itemView,chat);
+                }
+            });
+            itemView.setOnLongClickListener(view -> {
+                if (clickListener != null) {
+                    return clickListener.onLongItemClick(itemView, chat);
+                }
+                return false;
+            });
         }
 
         public void bind(Chat chat){
             id = chat.getId();
-            image.setImageURI(Uri.parse(chat.getImageUri()));
+            this.chat = chat;
+            if (chat.getImageUri() != null && !chat.getImageUri().isEmpty()) {
+                image.setImageURI(Uri.parse(chat.getImageUri()));
+            }
+            else {
+                image.setImageResource(R.drawable.logo256);
+            }
             name.setText(chat.getName());
             if (chat.getLastMessage() != null) {
                 lastMessage.setText(chat.getLastMessage().getText());
@@ -220,17 +241,6 @@ public class DialogRecyclerAdapter
             }
         }
 
-        @Override
-        public void onItemClick(View view, int position) {
-           if (clickListener!=null){
-               clickListener.onItemClick(view,position);
-           }
-        }
-
-        @Override
-        public void onLongItemClick(View view, int position) {
-            clickListener.onLongItemClick(view,position);
-        }
 
     }
 

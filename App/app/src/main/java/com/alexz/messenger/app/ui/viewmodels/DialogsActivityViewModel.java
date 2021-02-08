@@ -1,8 +1,6 @@
 package com.alexz.messenger.app.ui.viewmodels;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
@@ -15,14 +13,6 @@ import androidx.lifecycle.ViewModel;
 import com.alexz.messenger.app.data.model.Chat;
 import com.alexz.messenger.app.data.model.Message;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
-import com.alexz.messenger.app.ui.activities.ChatActivity;
-import com.alexz.messenger.app.util.FirebaseUtil;
-import com.alexz.messenger.app.util.NotificationUtil;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,9 +22,11 @@ import com.messenger.app.BuildConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DialogsActivityViewModel extends ViewModel {
 
@@ -44,15 +36,14 @@ public class DialogsActivityViewModel extends ViewModel {
 
     private final MutableLiveData<List<Chat>> chats = new MutableLiveData<>();
     private final MutableLiveData<Void> loadingEnded = new MutableLiveData<>();
+    private final MutableLiveData<Void> loadingStarted = new MutableLiveData<>();
 
-    private final Map<String,Chat> observableChats = new HashMap<>();
-    private final Map<String,DatabaseReference> chatRefs = new HashMap<>();
-    private final Map<String, ValueEventListener> chatListeners = new HashMap<>();
+    private final Map<String,Chat> observableChats = new ConcurrentHashMap<>();
+    private final Map<String,DatabaseReference> chatRefs = new ConcurrentHashMap<>();
+    private final Map<String, ValueEventListener> chatListeners = new ConcurrentHashMap<>();
     private Pair<DatabaseReference, ChildEventListener> userChatsRefAndListener;
 
     private long chatCount;
-
-    private boolean listening = false;
 
     public LiveData<List<Chat>> getChats(){
         return chats;
@@ -62,8 +53,8 @@ public class DialogsActivityViewModel extends ViewModel {
         return loadingEnded;
     }
 
-    public void setOnline(boolean online){
-        repo.setOnline(online);
+    public MutableLiveData<Void> getStartLoadingObservable() {
+        return loadingStarted;
     }
 
     public void createChat(Chat chat){
@@ -72,6 +63,8 @@ public class DialogsActivityViewModel extends ViewModel {
 
     public void startListening(Context context) {
         if (userChatsRefAndListener == null) {
+
+            loadingStarted.postValue(null);
 
             DatabaseReference ref = repo.getChatIds();
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -144,37 +137,6 @@ public class DialogsActivityViewModel extends ViewModel {
         }
     }
 
-    @SuppressLint("CheckResult")
-    public void notifyNewMessage(Context context, Chat chat){
-        Glide.with(context).asBitmap().load(chat.getImageUri()).circleCrop().addListener(new RequestListener<Bitmap>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                if (BuildConfig.DEBUG) {
-                    Log.w(TAG, "[!] Failed to load chat bitmap for notification. Notified without image");
-                }
-                NotificationUtil.with(context)
-                        .setTitle(chat.getLastMessage().getSenderName())
-                        .setText(chat.getLastMessage().getText())
-                        .setAutoCancel(true)
-                        .setIntent(ChatActivity.getIntent(context, chat))
-                        .execute(0);
-                return true;
-            }
-
-            @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                NotificationUtil.with(context)
-                        .setIcon(resource)
-                        .setTitle(chat.getLastMessage().getSenderName())
-                        .setText(chat.getLastMessage().getText())
-                        .setAutoCancel(true)
-                        .setIntent(ChatActivity.getIntent(context, chat))
-                        .execute(0);
-                return  true;
-            }
-        }).submit();
-    }
-
     public void stopListening() {
 
         if (userChatsRefAndListener != null) {
@@ -210,14 +172,14 @@ public class DialogsActivityViewModel extends ViewModel {
                     observableChats.put(chatId,chat);
                     notifyDataChanged(observableChats.values());
                     Message lastMessage = chat.getLastMessage();
-                    if (lastMessage != null && !lastMessage.getSenderId().equals(FirebaseUtil.getCurrentUser().getId())){
-                        notifyNewMessage(context,chat);
-                    }
                 } else {
                     repo.removeEmptyChatId(chatId);
                 }
 
                 if (observableChats.size() == chatCount){
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Loading finished");
+                    }
                     loadingEnded.postValue(null);
                 }
             }
@@ -260,6 +222,7 @@ public class DialogsActivityViewModel extends ViewModel {
         if (newData != null) {
             mldChats.addAll(newData);
         }
+        Collections.sort(mldChats);
         chats.postValue(mldChats);
     }
 }

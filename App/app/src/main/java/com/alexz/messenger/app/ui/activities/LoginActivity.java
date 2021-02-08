@@ -3,8 +3,10 @@ package com.alexz.messenger.app.ui.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.app.job.JobScheduler;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,6 +22,7 @@ import androidx.cardview.widget.CardView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alexz.messenger.app.data.model.Result;
+import com.alexz.messenger.app.data.services.NewMessageService;
 import com.alexz.messenger.app.ui.viewmodels.LoginActivityViewModel;
 import com.alexz.messenger.app.util.MetrixUtil;
 import com.alexz.messenger.app.util.MyGoogleUtils;
@@ -37,6 +40,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private static final String STR_COUNTER = "counter";
     private SignInButton btnGoogleSighIn;
+
     private LoginActivityViewModel viewModel;
     private CardView logo;
     private int counter = 0;
@@ -95,6 +99,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void updateUI(){
+        Intent intent = new Intent(this, NewMessageService.class);
+//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+//            startService(intent);
+//        } else {
+//           startForegroundService(intent);
+//        }
         new Handler(Looper.getMainLooper()).postDelayed(() ->
                startActivity(new Intent(this, DialogsActivity.class)),100);
     }
@@ -108,11 +118,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else{
             btnGoogleSighIn.setVisibility(View.VISIBLE);
         }
-    }
-
-    void setupAccount(GoogleSignInAccount account){
-        ;
-        viewModel.login(account);
     }
 
     public void onGoogleSignIn(View view) {

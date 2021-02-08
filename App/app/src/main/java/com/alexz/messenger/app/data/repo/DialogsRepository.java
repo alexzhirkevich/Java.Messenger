@@ -32,16 +32,6 @@ public class DialogsRepository {
         return instance;
     }
 
-
-    public void setOnline(boolean online){
-        User u = FirebaseUtil.getCurrentUser();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseUtil.USERS)
-                .child(u.getId()).child(FirebaseUtil.ONLINE);
-
-        ref.setValue(online);
-    }
-
     public void createChat(Chat d){
         String userId = FirebaseUtil.getCurrentUser().getId();
 

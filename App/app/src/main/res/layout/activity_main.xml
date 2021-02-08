@@ -62,6 +62,7 @@
                 android:layout_height="wrap_content"
                 android:indeterminateDrawable="@drawable/progressbar"
                 android:layout_marginTop="50dp"
+                android:visibility="invisible"
                 android:layout_centerInParent="true" />
 
             <com.alexz.messenger.app.ui.chats.DialogFloatingButton

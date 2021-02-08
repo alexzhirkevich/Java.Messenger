@@ -1,5 +1,7 @@
 package com.alexz.messenger.app.data.repo;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -19,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.messenger.app.BuildConfig;
 
 public class AuthRepository {
 
@@ -50,19 +53,26 @@ public class AuthRepository {
         });
     }
     private void addUserToDatabase(FirebaseUser user) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(FirebaseUtil.USERS);
-        ref.orderByChild("id").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseUtil.USERS)
+                .child(user.getUid())
+                .child(FirebaseUtil.INFO)
+                .child(FirebaseUtil.ID);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()){
-                    User u = new User(user.getUid(),user.getPhotoUrl().toString(),user.getDisplayName());
-                    FirebaseDatabase.getInstance().getReference(FirebaseUtil.USERS).child(user.getUid()).setValue(u);
+                if (!snapshot.exists()) {
+                    User u = new User(user.getUid(), user.getPhotoUrl().toString(), user.getDisplayName());
+                    u.setOnline(true);
+                    ref.getParent().setValue(u);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                if (BuildConfig.DEBUG){
+                    Log.e(TAG, "Failed to load user");
+                }
             }
         });
     }

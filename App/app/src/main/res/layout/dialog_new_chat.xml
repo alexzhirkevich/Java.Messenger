@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_margin="10dp">
+    android:padding="5dp"
+    android:background="?attr/colorPrimary">
 
     <EditText
         android:id="@+id/edit_create_name"
@@ -12,21 +13,33 @@
         android:layout_height="wrap_content"
         android:hint="@string/hint_chat_name"
         android:textSize="20sp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:textColor="@color/white"
         android:inputType="textCapSentences"
         android:maxLines="1"/>
 
-    <EditText
-        android:id="@+id/edit_create_url"
+    <Button
+        android:id="@+id/btn_create_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_photo_url"
+        android:layout_marginHorizontal="5dp"
+        android:text="@string/title_upload_photo"
         android:textSize="20sp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:inputType="textUri"
-        android:maxLines="1"/>
+        android:textAllCaps="false"
+        android:textColor="@color/white"/>
+
+    <ProgressBar
+        android:id="@+id/progress_photo_upload"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/progressbar_solid"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginHorizontal="10dp"
+        android:indeterminate="false"
+        android:paddingHorizontal="5dp"
+        android:progress="0"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/btn_create_chat"
@@ -35,7 +48,6 @@
         android:text="@string/create"
         android:textSize="20sp"
         android:textAllCaps="false"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginHorizontal="5dp"/>
 
 </LinearLayout>

@@ -6,8 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,9 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexz.messenger.app.data.model.Chat;
 import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.Result;
 import com.alexz.messenger.app.data.model.User;
 import com.alexz.messenger.app.ui.viewmodels.ChatActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
+import com.google.firebase.storage.StorageReference;
 import com.messenger.app.R;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
 import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
@@ -37,7 +38,7 @@ import com.alexz.messenger.app.ui.messages.MessageFirebaseRecyclerAdapter;
 
 import java.util.Date;
 
-public class    ChatActivity extends AppCompatActivity
+public class    ChatActivity extends BaseActivity
     implements MessageInput.OnSendListener, MessageInput.OnAttachListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String STR_PRIVATE = "private";
@@ -58,9 +59,9 @@ public class    ChatActivity extends AppCompatActivity
         context.startActivity(intent);
     }
 
-    public static Intent getIntent(Context context, Chat chat){
+    public static Intent getIntent(Context context, String chatID){
         Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(EXTRA_CHAT_ID, chat.getId());
+        intent.putExtra(EXTRA_CHAT_ID, chatID);
         return intent;
     }
 
@@ -69,13 +70,12 @@ public class    ChatActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        final AvatarImageView avatarImageView = findViewById(R.id.chat_avatar);
-        final TextView tvChatName = findViewById(R.id.chat_name);
+
 
         chatId = getIntent().getStringExtra(EXTRA_CHAT_ID);
         viewModel = new ViewModelProvider(this).get(ChatActivityViewModel.class);
         viewModel.setChatId(chatId);
-        setupChatInfo(chatId,avatarImageView,tvChatName);
+        setupChatInfo(chatId);
 
         setupRecyclerView();
         setupInput();
@@ -115,6 +115,8 @@ public class    ChatActivity extends AppCompatActivity
                     Toast.makeText(ChatActivity.this, getString(R.string.action_chat_id_copied), Toast.LENGTH_SHORT).show();
                     return true;
                 }
+            } else if (item.getItemId() == R.id.menu_chat_users){
+                UserListActivity.startActivity(this,chatId);
             }
         }
         return true;
@@ -144,27 +146,39 @@ public class    ChatActivity extends AppCompatActivity
 
     @Override
     public void OnAttachClicked(ImageButton btn, TextView input) {
-//        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-//        photoPickerIntent.setType("image/*");
-//        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-//        switch (requestCode) {
-//            case SELECT_PHOTO:
-//                if (resultCode == RESULT_OK) {
-//                    Message m = new Message(
-//                            new User("5", FirebaseUtil.getCurrentUser().getPhotoUrl().toString(),FirebaseUtil.getCurrentUser().getEmail(), "Name"),
-//                            new Date().getTime()
-//                    );
-//                    m.setImageUrl(imageReturnedIntent.getData().toString());
-//                    adapter.add(m);
-//                    scrollToBottom(100);
-//                }
-//        }
+        switch (requestCode) {
+            case SELECT_PHOTO:
+                if (resultCode == RESULT_OK) {
+                    FirebaseUtil.uploadPhoto(imageReturnedIntent.getData())
+                            .addResultListener(new Result.ResultListener<Pair<Uri, StorageReference>>() {
+                                @Override
+                                public void onSuccess(@NonNull Result.ISuccess<Pair<Uri, StorageReference>> result) {
+                                    Message m = viewModel.emptyMessage(chatId);
+                                    m.setImageUrl(result.get().first.toString());
+                                    viewModel.sendMessage(m);
+                                }
+
+                                @Override
+                                public void onError(@Nullable Result.IError error) {
+                                    Toast.makeText(ChatActivity.this,error.getError(),Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onProgress(@Nullable Double percent) {
+
+                                }
+                            });
+                }
+        }
     }
 
     @Override
@@ -201,7 +215,11 @@ public class    ChatActivity extends AppCompatActivity
             public boolean onLongItemClick(View view, Message message) {
                 PopupMenu pm = new PopupMenu(ChatActivity.this, view);
                 pm.setGravity(Gravity.RIGHT);
-                pm.inflate(R.menu.menu_message);
+                if (message.getSenderId().equals(FirebaseUtil.getCurrentUser().getId())) {
+                    pm.inflate(R.menu.menu_message_out);
+                } else {
+                    pm.inflate(R.menu.menu_message_in);
+                }
                 pm.setOnMenuItemClickListener(e -> {
                     switch (e.getItemId()) {
 
@@ -265,34 +283,37 @@ public class    ChatActivity extends AppCompatActivity
         }
     }
 
-    private void setupChatInfo(String chatId, AvatarImageView avatar, TextView tvChatName){
-        if (viewModel!=null){
-            viewModel.getChat(chatId).addOnSuccessListener(snapshot -> {
-                if (snapshot.exists()){
-                    Chat chat = snapshot.getValue(Chat.class);
-                    if (chat!=null){
-                        isPrivate =  !chat.isGroup();
-                        final String avatarUrl = chat.getImageUri();
-                        final String chatName = chat.getName();
+    private void setupChatInfo(String chatId) {
+        final AvatarImageView avatarImageView = findViewById(R.id.chat_avatar);
+        final TextView tvChatName = findViewById(R.id.chat_name);
+        FirebaseUtil.getChatInfo(chatId).addResultListener(new Result.ResultListener<Chat>() {
+            @Override
+            public void onSuccess(@NonNull Result.ISuccess<Chat> result) {
+                Chat chat = result.get();
+                if (chat != null) {
+                    isPrivate = !chat.isGroup();
+                    final String avatarUrl = chat.getImageUri();
+                    final String chatName = chat.getName();
 
 
-                        if (tvChatName != null && chatName != null) {
-                            tvChatName.post(() -> tvChatName.setText(chatName));
-                        }
-                        if (avatar != null && avatarUrl != null) {
-                            avatar.post( () -> avatar.setImageURI(Uri.parse(avatarUrl)));
-                        }
-                    } else{
-                        new Handler(Looper.getMainLooper()).post(this::errorChatLoad);
+                    if (tvChatName != null && chatName != null) {
+                        tvChatName.setText(chatName);
                     }
-                } else{
-                    new Handler(Looper.getMainLooper()).post(this::errorChatLoad);
+                    if (avatarImageView != null && avatarUrl != null) {
+                        avatarImageView.setImageURI(Uri.parse(avatarUrl));
+                    }
                 }
-            }).addOnFailureListener(e -> new Handler(Looper.getMainLooper()).post(this::errorChatLoad));
-        }
-    }
-    private void errorChatLoad(){
-        Toast.makeText(ChatActivity.this,R.string.error_chat_not_found,Toast.LENGTH_SHORT).show();
-        finish();
+            }
+
+            @Override
+            public void onError(@Nullable Result.IError error) {
+                if (error != null) {
+                    Toast.makeText(ChatActivity.this, error.getError(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ChatActivity.this, R.string.error_chat_load, Toast.LENGTH_SHORT).show();
+                }
+                finish();
+            }
+        });
     }
 }

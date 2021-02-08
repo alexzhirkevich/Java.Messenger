@@ -8,46 +8,7 @@
     tools:context="com.alexz.messenger.app.ui.activities.ChatActivity"
     android:background="@color/color_background_dark">
 
-    <!--    TOOLBAR     -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/layout_appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.App.AppBarOverlay">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/chat_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:menu="@menu/menu_chat"
-            style="@style/Toolbar"
-            app:popupTheme="@style/Theme.App.PopupOverlay">
-
-            <com.alexz.messenger.app.ui.common.AvatarImageView
-                android:id="@+id/chat_avatar"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:scaleType="centerInside"
-                android:padding="1dp"
-                android:src="@drawable/logo256"
-                android:layout_gravity="center_vertical"/>
-            <TextView
-                android:id="@+id/chat_name"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
-                android:text="Chat Name"
-                android:textColor="@color/white"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:textSize="@dimen/chat_name_text_size"
-                tools:ignore="HardcodedText" />
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
+    <include layout="@layout/toolbar_chat" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/message_recycler_view"
@@ -70,11 +31,9 @@
 
         <!--    INPUT     -->
     <com.alexz.messenger.app.ui.messages.MessageInput
-        android:background="@color/color_background"
         android:id="@+id/message_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:paddingBottom="5dp"/>
+        android:background="@color/color_background" />
 
 </LinearLayout>

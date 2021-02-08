@@ -7,11 +7,12 @@ import androidx.annotation.Nullable;
 
 import com.alexz.messenger.app.util.FirebaseUtil;
 
-public class User implements IUser, Parcelable {
+public class User implements IUser, Parcelable, Comparable<User> {
 
     private String id;
     private String name;
     private String imageUri;
+    private long lastOnline;
     private boolean online;
 
     public User(){
@@ -90,10 +91,28 @@ public class User implements IUser, Parcelable {
         this.imageUri = uri;
     }
 
+    @Override
+    public long getLastOnline(){
+        return lastOnline;
+    }
+
+    @Override
+    public void setLastOnline(long lastOnline) {
+        this.lastOnline = lastOnline;
+    }
+
+    @Override
     public boolean isOnline(){
         return online;
     }
+
+    @Override
     public void setOnline(Boolean online) {
         this.online = online;
+    }
+
+    @Override
+    public int compareTo(User user) {
+        return name.compareTo(user.name);
     }
 }

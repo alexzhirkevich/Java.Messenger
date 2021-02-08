@@ -3,18 +3,19 @@
     package="com.messenger.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:allowBackup="true"
+        android:name="com.alexz.messenger.app.ChatApplication"
         android:icon="@mipmap/ic_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
-        <activity android:name="com.alexz.messenger.app.ui.activities.NewChatActivity"></activity>
+        <activity android:name="com.alexz.messenger.app.ui.activities.UserListActivity"
+            android:theme="@style/Theme.App.NoActionBar"/>
         <activity
             android:name="com.alexz.messenger.app.ui.activities.SettingsActivity"
             android:label="@string/menu_settings" />
@@ -41,6 +42,18 @@
             android:name="com.alexz.messenger.app.ui.activities.DialogsActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.App.NoActionBar" />
+
+        <service
+            android:name="com.alexz.messenger.app.data.services.NewMessageService"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false" />
+        <service
+            android:name="com.alexz.messenger.app.data.services.NewMessageJobService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

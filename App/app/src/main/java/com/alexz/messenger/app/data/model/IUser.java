@@ -12,4 +12,12 @@ public interface IUser {
 
     @Nullable String getImageUri();
     void setImageUri(String uri);
+
+    long getLastOnline();
+
+    void setLastOnline(long lastOnline);
+
+    boolean isOnline();
+
+    void setOnline(Boolean online);
 }

@@ -3,10 +3,12 @@ package com.alexz.messenger.app.util;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.os.Build;
 
@@ -19,6 +21,7 @@ public class NotificationUtil {
 
     private final Context context;
     private final NotificationCompat.Builder builder;
+
 
     private NotificationUtil(Context context){
         this.context = context;
@@ -48,7 +51,7 @@ public class NotificationUtil {
 
     public NotificationUtil setIntent(Intent intent){
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        builder.setContentIntent(PendingIntent.getActivity(context,0,intent,0));
+        builder.setContentIntent(PendingIntent.getActivity(context,0,intent, PendingIntent.FLAG_UPDATE_CURRENT));
         return this;
     }
 
@@ -68,6 +71,8 @@ public class NotificationUtil {
                     context.getString(R.string.app_name),
                     NotificationManager.IMPORTANCE_DEFAULT
             );
+            channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                    new AudioAttributes.Builder().build());
             notificationManager.createNotificationChannel(channel);
         }
         notificationManager.notify(id, builder.build());

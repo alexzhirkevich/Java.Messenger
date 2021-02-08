@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    tools:context="com.alexz.messenger.app.ui.activities.UserListActivity">
+
+    <include layout="@layout/toolbar_chat" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/user_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        android:fadeScrollbars="true"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/gray"/>
+
+    <ProgressBar
+        android:id="@+id/user_loading_pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@drawable/progressbar"
+        android:layout_marginTop="50dp"
+        android:visibility="invisible"
+        android:layout_centerInParent="true" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

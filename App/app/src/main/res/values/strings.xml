@@ -1,6 +1,5 @@
 <resources>
-    <string name="google_oauth_id">215159501136-pbd6g3vi2crvcbdnt737tr5omdcj7hir.apps.googleusercontent.com</string>
-    <string name="app_name">App</string>
+    <string name="app_name">Chatik bez backenda</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -47,7 +46,7 @@
 
     <string name="error_notfound">There are no chats with that name</string>
     <string name="error_load_dialogs">Failed to get dialogs. Check your Internet connection.</string>
-    <string name="error_load_dialog">Failed to get chat info. Check your Internet connection.</string>
+    <string name="error_chat_load">Failed to get chat info. Check your Internet connection.</string>
     <string name="error_send_message">Failed to send message. Check your Internet connection.</string>
     <string name="error_google_connecting">Cannot connect to google services</string>
     <string name="error_server">Server error</string>
@@ -79,9 +78,13 @@
     <string name="error_empty_input">Input is empty</string>
     <string name="error_chat_not_found">Chat not found</string>
     <string name="hint_chat_name">Chat name</string>
-    <string name="hint_photo_url">Photo url</string>
+    <string name="title_upload_photo">Avatar (optional)</string>
     <string name="create">Create</string>
     <string name="menu_chat_invite">Invite friends</string>
+    <string name="online">Online</string>
+    <string name="menu_chat_users">Chat members</string>
+    <string name="error_upload_file">Failed to upload file</string>
+    <string name="title_remove_photo">Remove photo</string>
 
 
 </resources>

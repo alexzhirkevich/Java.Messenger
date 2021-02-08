@@ -56,7 +56,7 @@
             android:paddingBottom="5dp"
             android:autoLink="web|phone|email"
             android:linksClickable="true"
-            android:text="This is multiline text\nmessage"
+            android:text="Text"
             android:textColor="@color/white"
             android:textSize="@dimen/message_text_size" />
 

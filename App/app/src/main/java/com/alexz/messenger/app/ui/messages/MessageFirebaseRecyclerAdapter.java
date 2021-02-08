@@ -2,6 +2,7 @@ package com.alexz.messenger.app.ui.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,8 +26,14 @@ import com.alexz.messenger.app.util.DateUtil;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.alexz.messenger.app.util.MetrixUtil;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Transformation;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.engine.Resource;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -129,6 +137,7 @@ public class MessageFirebaseRecyclerAdapter
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
 
+        private final String TAG = MessageViewHolder.class.getSimpleName();
         private Message message;
         private final AvatarImageView avatar;
         private final RelativeLayout msgData;
@@ -230,7 +239,7 @@ public class MessageFirebaseRecyclerAdapter
             }
 
             if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()){
-                Glide.with(image).load(message.getImageUrl()).transform(new Transformation<Bitmap>() {
+                Glide.with(image).asBitmap().load(message.getImageUrl()).transform(new Transformation<Bitmap>() {
                     @NonNull
                     @Override
                     public Resource<Bitmap> transform(@NonNull Context context, @NonNull Resource<Bitmap> resource, int outWidth, int outHeight) {
@@ -270,9 +279,31 @@ public class MessageFirebaseRecyclerAdapter
                     public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
 
                     }
-                }).into(image);
+                }).addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        Log.d(TAG, "Failed to load image: " + e.getMessage());
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            image.getLayoutParams().width = resource.getWidth();
+                            image.getLayoutParams().height = resource.getHeight();
+                            image.requestLayout();
+                            image.setImageBitmap(resource);
+                        });
+                        return true;
+                    }
+                }).diskCacheStrategy(DiskCacheStrategy.ALL).submit();
+
                 image.setVisibility(View.VISIBLE);
             }  else{
+                image.setImageDrawable(null);
+                image.getLayoutParams().height= 0;
+                image.getLayoutParams().width = 0;
+                image.requestLayout();
                 image.setVisibility(View.INVISIBLE);
             }
             if (message.getTime() != null) {
