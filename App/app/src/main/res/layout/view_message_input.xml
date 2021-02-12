@@ -25,7 +25,7 @@
         android:layout_gravity="bottom"
         android:layout_weight="1"
         android:background="@android:color/transparent"
-        android:hint="@string/message"
+        android:hint="@string/title_message"
         android:gravity="bottom"
         android:paddingBottom="10dp"
         android:inputType="textMultiLine|textCapSentences"

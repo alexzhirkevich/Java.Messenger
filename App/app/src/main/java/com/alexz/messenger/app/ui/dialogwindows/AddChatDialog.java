@@ -21,7 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alexz.messenger.app.data.model.Chat;
+import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.Result;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
@@ -98,7 +98,7 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
             if (editId!=null){
                 String id = editId.getText().toString().trim();
                 onBackPressed();
-                DialogsRepository.getInstance().findChat(id, getContext());
+                DialogsRepository.findChat(id, getContext());
             }
         }
 
@@ -181,8 +181,8 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
                     deletePhoto = false;
                     onBackPressed();
                     Chat c = new Chat(imageUri.toString(), name, true);
-                    DialogsRepository.getInstance().createChat(c);
-                    ChatActivity.startActivity(getContext(), c.getId());
+                    DialogsRepository.createChat(c);
+                    ChatActivity.startActivity(getContext(), c.getId(),c.getName(),c.getImageUri());
 
                 } else {
                     Toast.makeText(getContext(), R.string.error_empty_input, Toast.LENGTH_LONG).show();

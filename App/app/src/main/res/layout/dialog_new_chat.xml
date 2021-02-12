@@ -11,7 +11,7 @@
         android:id="@+id/edit_create_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_chat_name"
+        android:hint="@string/title_chat_name"
         android:textSize="20sp"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
@@ -45,7 +45,7 @@
         android:id="@+id/btn_create_chat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/create"
+        android:text="@string/title_create"
         android:textSize="20sp"
         android:textAllCaps="false"
         android:layout_marginHorizontal="5dp"/>

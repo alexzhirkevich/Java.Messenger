@@ -1,31 +1,22 @@
 package com.alexz.messenger.app.util;
 
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Pair;
 import android.webkit.MimeTypeMap;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.Result;
-import com.alexz.messenger.app.data.model.User;
+import com.alexz.messenger.app.data.model.imp.User;
 import com.alexz.messenger.app.data.repo.MessagesRepository;
-import com.google.android.gms.auth.api.signin.internal.Storage;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.messenger.app.R;
 
-import java.text.DateFormat;
-import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Locale;
 
 public class FirebaseUtil {
 

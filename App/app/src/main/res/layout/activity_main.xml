@@ -11,7 +11,7 @@
 
 
     <!--    CONTENT      -->
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,6 +19,7 @@
 
         <!--    APPBAR      -->
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/layout_appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/Theme.App.AppBarOverlay">
@@ -31,58 +32,91 @@
                 style="@style/Toolbar"
                 app:popupTheme="@style/Theme.App.PopupOverlay">
 
-                <com.alexz.messenger.app.ui.chats.DialogSearch
+                <EditText
                     android:id="@+id/edit_search"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Name" />
+                    android:hint="@string/title_chat_name"
+                    android:visibility="invisible"
+                    android:inputType="textCapSentences"
+                    android:importantForAutofill="no" />
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="horizontal"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:tabIndicatorColor="@color/white"/>
             </androidx.appcompat.widget.Toolbar>
-
         </com.google.android.material.appbar.AppBarLayout>
 
+        <androidx.viewpager.widget.ViewPager
+            android:layout_below="@id/layout_appbar"
+            android:id="@+id/main_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.alexz.messenger.app.ui.chats.DialogFloatingButton
+            android:id="@+id/fab_dialogs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="15dp"
+            android:src="@drawable/ic_pen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+<!--        </com.google.android.material.appbar.AppBarLayout>-->
+
         <!--    DIALOGS      -->
-        <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/fragment_dialog">
+<!--        <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:id="@+id/fragment_dialog">-->
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/dialog_list_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scrollbars="vertical"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:fadeScrollbars="true"
-                    android:scrollbarSize="2dp"
-                    android:scrollbarThumbVertical="@color/gray"/>
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:id="@+id/dialog_list_view"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:scrollbars="vertical"-->
+<!--                    android:scrollbarStyle="outsideOverlay"-->
+<!--                    android:fadeScrollbars="true"-->
+<!--                    android:scrollbarSize="2dp"-->
+<!--                    tools:listitem="@layout/item_dialog"-->
+<!--                    android:scrollbarThumbVertical="@color/gray"/>-->
 
-            <ProgressBar
-                android:id="@+id/dialog_loading_pb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminateDrawable="@drawable/progressbar"
-                android:layout_marginTop="50dp"
-                android:visibility="invisible"
-                android:layout_centerInParent="true" />
+<!--            <ProgressBar-->
+<!--                android:id="@+id/dialog_loading_pb"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:indeterminateDrawable="@drawable/progressbar"-->
+<!--                android:layout_marginTop="50dp"-->
+<!--                android:visibility="invisible"-->
+<!--                android:layout_centerInParent="true" />-->
 
-            <com.alexz.messenger.app.ui.chats.DialogFloatingButton
-                android:id="@+id/fab_dialogs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="bottom|end"
-                android:layout_marginStart="@dimen/fab_margin"
-                android:layout_marginTop="@dimen/fab_margin"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="15dp"
-                android:src="@drawable/ic_pen"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+<!--            <com.alexz.messenger.app.ui.chats.DialogFloatingButton-->
+<!--                android:id="@+id/fab_dialogs"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_alignParentBottom="true"-->
+<!--                android:layout_gravity="bottom|end"-->
+<!--                android:layout_marginStart="@dimen/fab_margin"-->
+<!--                android:layout_marginTop="@dimen/fab_margin"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:layout_marginBottom="15dp"-->
+<!--                android:src="@drawable/ic_pen"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent" />-->
 
-            </RelativeLayout>
+<!--            </RelativeLayout>-->
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <!--    DRAWER      -->
     <com.google.android.material.navigation.NavigationView

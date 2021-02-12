@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_background"
+    android:background="@color/color_background_dark"
     tools:context="com.alexz.messenger.app.ui.activities.UserListActivity">
 
     <include layout="@layout/toolbar_chat" />

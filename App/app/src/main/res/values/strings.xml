@@ -12,17 +12,35 @@
     <string name="menu_about">About</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_copy">Copy</string>
+    <string name="menu_chat_invite">Invite friends</string>
+    <string name="menu_chat_users">Chat members</string>
 
     <string name="action_message_copied">Message copied to clipboard</string>
     <string name="action_chat_id_copied">Chat id copied to clipboard</string>
 
-    <string name="you">You</string>
+    <string name="title_new_chat">New chat</string>
+    <string name="title_find_chat">Find chat</string>
+    <string name="title_find">Find</string>
+    <string name="title_chat_id">Chat id</string>
+    <string name="title_chat_name">Chat name</string>
+    <string name="title_upload_photo">Avatar (optional)</string>
+    <string name="title_create">Create</string>
+    <string name="title_online">Online</string>
+    <string name="title_you">You</string>
+    <string name="title_account">Account</string>
+    <string name="title_message">Message</string>
+    <string name="title_photo">Photo</string>
+    <string name="title_properties">Properties</string>
+    <string name="error_upload_file">Failed to upload file</string>
+    <string name="title_remove_photo">Remove photo</string>
+    <string name="title_chats">Chats</string>
+    <string name="title_channels">Channels</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_signature">Your signature</string>
+    <string name="title_reply">Default reply action</string>
+
     <string name="open">open</string>
     <string name="close">close</string>
-    <string name="account">Account</string>
-    <string name="message">Message</string>
-    <string name="photo">Photo</string>
-    <string name="properties">Properties</string>
 
     <string name="easter_1">I don\'t have any function.</string>
     <string name="easter_2">I\'m not joking bro. Stop this</string>
@@ -43,7 +61,6 @@
     <string name="easter_14">150 click! You won a prize. Login to get it</string>
     <string name="easter_15">The game is really over =) All other clicks will redirect you to login procedure. Bye!</string>
 
-
     <string name="error_notfound">There are no chats with that name</string>
     <string name="error_load_dialogs">Failed to get dialogs. Check your Internet connection.</string>
     <string name="error_chat_load">Failed to get chat info. Check your Internet connection.</string>
@@ -53,8 +70,8 @@
     <string name="error_google_login">Login error</string>
     <string name="error_gservices_ver">Google Play services out of date. Requires 12451000 but found </string>
     <string name="error_empty_message">Message can\'t be empty</string>
-
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="error_empty_input">Input is empty</string>
+    <string name="error_chat_not_found">Chat not found</string>
 
     <!-- Preference Titles -->
     <string name="header_theme">Theme</string>
@@ -62,8 +79,6 @@
     <string name="header_sync">Sync</string>
 
     <!-- Messages Preferences -->
-    <string name="title_signature">Your signature</string>
-    <string name="title_reply">Default reply action</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
@@ -71,20 +86,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="title_new_chat">New chat</string>
-    <string name="title_find_chat">Find chat</string>
-    <string name="find">Find</string>
-    <string name="title_chat_id">Chat id</string>
-    <string name="error_empty_input">Input is empty</string>
-    <string name="error_chat_not_found">Chat not found</string>
-    <string name="hint_chat_name">Chat name</string>
-    <string name="title_upload_photo">Avatar (optional)</string>
-    <string name="create">Create</string>
-    <string name="menu_chat_invite">Invite friends</string>
-    <string name="online">Online</string>
-    <string name="menu_chat_users">Chat members</string>
-    <string name="error_upload_file">Failed to upload file</string>
-    <string name="title_remove_photo">Remove photo</string>
+
+
 
 
 </resources>

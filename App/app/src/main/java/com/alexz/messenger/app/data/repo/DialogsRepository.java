@@ -6,43 +6,34 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.User;
+import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.messenger.app.BuildConfig;
 import com.messenger.app.R;
 
 public class DialogsRepository {
 
-    private static volatile DialogsRepository instance;
-    private DatabaseReference dbReference = FirebaseDatabase.getInstance().getReference()
-            .child(FirebaseUtil.CHATS);
-
-    public static DialogsRepository getInstance() {
-        if (instance == null){
-            instance = new DialogsRepository();
-        }
-        return instance;
-    }
-
-    public void createChat(Chat d){
+    public static void createChat(Chat d){
         String userId = FirebaseUtil.getCurrentUser().getId();
 
-        DatabaseReference ref = dbReference.push();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseUtil.CHATS)
+                .push();
         d.setId(userId + ":" + ref.getKey());
         d.setCreatorId(userId);
-        dbReference
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseUtil.CHATS)
                 .child(d.getId())
                 .child(FirebaseUtil.INFO).setValue(d);
 
-        dbReference
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseUtil.CHATS)
                 .child(d.getId())
                 .child(FirebaseUtil.USERS)
                 .child(userId).setValue("");
@@ -54,7 +45,7 @@ public class DialogsRepository {
                 .setValue("");
     }
 
-    public void findChat(String chatId, Context openContext) {
+    public static void findChat(String chatId, Context openContext) {
 
         String id = FirebaseUtil.getCurrentUser().getId();
 
@@ -65,12 +56,16 @@ public class DialogsRepository {
                 .child(chatId)
                 .setValue("")
                 .addOnSuccessListener(aVoid ->
-                        dbReference.child(chatId).child(FirebaseUtil.INFO).addListenerForSingleValueEvent(new ValueEventListener() {
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(FirebaseUtil.CHATS)
+                                .child(chatId).child(FirebaseUtil.INFO).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            dbReference.child(chatId).child(FirebaseUtil.USERS).child(id).setValue("");
-                            ChatActivity.startActivity(openContext,chatId);
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child(FirebaseUtil.CHATS)
+                                    .child(chatId).child(FirebaseUtil.USERS).child(id).setValue("");
+                            ChatActivity.startActivity(openContext,chatId,"","");
                             if (BuildConfig.DEBUG) {
                                 Log.e("FIND CHAT", "SUCCESS: Chat added");
                             }
@@ -91,7 +86,7 @@ public class DialogsRepository {
                 }));
     }
 
-    public void removeEmptyChatId(String chatId){
+    public static void removeEmptyChatId(String chatId){
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.USERS)
                 .child(FirebaseUtil.getCurrentUser().getId())
@@ -99,24 +94,26 @@ public class DialogsRepository {
                 .child(chatId).setValue(null);
     }
 
-    public DatabaseReference getChatIds(){
+    public static DatabaseReference getChatIds(){
         return FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.USERS)
                 .child(FirebaseUtil.getCurrentUser().getId())
                 .child(FirebaseUtil.CHATS);
     }
 
-    public DatabaseReference getChat(String chatid){
+    public static DatabaseReference getChat(String chatid){
         return FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.CHATS)
                 .child(chatid)
                 .child(FirebaseUtil.INFO);
     }
 
-    public void removeChat(Chat chat) {
+    public static void removeChat(Chat chat) {
         String userId = FirebaseUtil.getCurrentUser().getId();
         if (chat.getCreatorId().equals(userId)) {
-            dbReference.child(chat.getId()).removeValue();
+            FirebaseDatabase.getInstance().getReference()
+                    .child(FirebaseUtil.CHATS)
+                    .child(chat.getId()).removeValue();
         } else {
             FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseUtil.USERS).

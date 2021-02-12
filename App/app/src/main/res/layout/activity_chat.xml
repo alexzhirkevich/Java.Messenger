@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.alexz.messenger.app.ui.activities.ChatActivity"
-    android:background="@color/color_background_dark">
+    android:background="@drawable/chat_wallp_3">
 
     <include layout="@layout/toolbar_chat" />
 
@@ -20,6 +20,7 @@
         android:scrollbarStyle="outsideOverlay"
         android:fadeScrollbars="true"
         android:scrollbarSize="2dp"
+        tools:listitem="@layout/item_message"
         android:scrollbarThumbVertical="@color/gray"
         android:layout_weight="1"/>
 

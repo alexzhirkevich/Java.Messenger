@@ -2,6 +2,7 @@ package com.alexz.messenger.app.ui.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
@@ -17,16 +18,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alexz.messenger.app.data.model.Message;
-import com.alexz.messenger.app.data.model.User;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.util.DateUtil;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.alexz.messenger.app.util.MetrixUtil;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Transformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -36,14 +36,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.DataSnapshot;
 import com.messenger.app.R;;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
+import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
 
 import java.security.MessageDigest;
 import java.util.Date;
-import java.util.function.Consumer;
 
 public class MessageFirebaseRecyclerAdapter
         extends FirebaseRecyclerAdapter<Message, MessageFirebaseRecyclerAdapter.MessageViewHolder> {
@@ -52,9 +50,6 @@ public class MessageFirebaseRecyclerAdapter
     private RecyclerItemClickListener<Message> avatarClickListener = null;
     private RecyclerItemClickListener<Message> nameClickListener = null;
     private RecyclerItemClickListener<Message> onItemClickListener = null;
-
-//    private int visibleItems = 10;
-//    private boolean acceptAdding = false;
 
     public MessageFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions<Message> options) {
         super(options);
@@ -98,37 +93,8 @@ public class MessageFirebaseRecyclerAdapter
 
         final View root = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
 
-//        if (acceptAdding){
-//            visibleItems++;
-//        }
         return new MessageViewHolder(root);
     }
-
-//    public void loadMore(int count){
-//        visibleItems+=count;
-//    }
-
-//    @Override
-//    public int getItemCount() {
-//        if (super.getItemCount() >= visibleItems){
-//            return visibleItems;
-//        }
-//        return super.getItemCount();
-//    }
-
-//    public int getRealItemCount(){
-//        return super.getItemCount();
-//    }
-
-//    public void acceptAdding(boolean accept){
-//        acceptAdding = true;
-//    }
-
-//    @NonNull
-//    @Override
-//    public Message getItem(int position) {
-//        return super.getItem(getItemCount() - position-1);
-//    }
 
     @Override
     protected void onBindViewHolder(@NonNull MessageViewHolder holder, int position, @NonNull Message model) {
@@ -237,7 +203,6 @@ public class MessageFirebaseRecyclerAdapter
             if (message.getText() != null) {
                 text.setText(message.getText());
             }
-
             if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()){
                 Glide.with(image).asBitmap().load(message.getImageUrl()).transform(new Transformation<Bitmap>() {
                     @NonNull
@@ -316,8 +281,13 @@ public class MessageFirebaseRecyclerAdapter
         private void transformLayoutParams(Message message,boolean outcoming){
 
             RelativeLayout.LayoutParams dataParams = (RelativeLayout.LayoutParams) msgData.getLayoutParams();
+            RelativeLayout.LayoutParams dateParams = (RelativeLayout.LayoutParams) date.getLayoutParams();
             RelativeLayout.LayoutParams textParams = (RelativeLayout.LayoutParams) text.getLayoutParams();
+            RelativeLayout.LayoutParams imageParams = (RelativeLayout.LayoutParams) image.getLayoutParams();
 
+            dateParams.addRule(RelativeLayout.BELOW,R.id.message_image);
+            imageParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+            imageParams.addRule(RelativeLayout.BELOW,R.id.message_text);
             dataParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
             dataParams.removeRule(RelativeLayout.END_OF);
             dataParams.removeRule(RelativeLayout.ALIGN_PARENT_START);
@@ -335,6 +305,11 @@ public class MessageFirebaseRecyclerAdapter
                 textParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
                 textParams.setMargins(0, topMargin, 0, 0);
                 dataParams.setMarginStart(MetrixUtil.dpToPx(msgData.getContext(), 50));
+                if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
+                    imageParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                } else {
+                    dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                }
             } else {
                 msgData.setBackgroundColor(msgData.getResources().getColor(R.color.message_incoming));
                 dataParams.setMarginEnd(MetrixUtil.dpToPx(msgData.getContext(), 50));
@@ -348,8 +323,16 @@ public class MessageFirebaseRecyclerAdapter
                 } else {
                     msgData.setBackground(AppCompatResources.getDrawable(msgData.getContext(), R.drawable.drawable_message_incoming_group));
                 }
+                if (message.getText() == null || message.getText().isEmpty()){
+                    imageParams.addRule(RelativeLayout.BELOW,R.id.message_sender);
+                } else {
+                    dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                }
             }
             msgData.requestLayout();
+            text.requestLayout();
+            image.requestLayout();
+            date.requestLayout();
         }
     }
 }

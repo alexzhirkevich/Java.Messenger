@@ -22,7 +22,7 @@
         android:id="@+id/btn_find_chat_ok"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/find"
+        android:text="@string/title_find"
         android:textSize="20sp"
         android:textAllCaps="false"
         android:layout_marginStart="0dp"

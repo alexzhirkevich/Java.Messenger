@@ -4,115 +4,66 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.ui.chats.DialogRecyclerAdapter;
-import com.alexz.messenger.app.ui.chats.DialogSearch;
+import com.alexz.messenger.app.data.model.imp.Chat;
+import com.alexz.messenger.app.ui.chats.ChatRecyclerAdapter;
+import com.alexz.messenger.app.ui.chats.ChatsViewPagerAdapter;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
+import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
 import com.alexz.messenger.app.ui.dialogwindows.AddChatDialog;
 import com.alexz.messenger.app.ui.viewmodels.DialogsActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
+import com.alexz.messenger.app.util.KeyboardUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.messenger.app.R;
 
 public class DialogsActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        RecyclerItemClickListener<Chat> {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String STR_DIALOGS = "dialogs";
     private static final String STR_RECYCLER_DATA = "recyclerview_data";
 
-    private DialogRecyclerAdapter adapter;
     private DrawerLayout drawerLayout;
-    private DialogSearch search;
-    private DatabaseReference ref  = FirebaseDatabase.getInstance().getReference().child(FirebaseUtil.CHATS);
-    private DialogsActivityViewModel viewModel;
-    private RecyclerView dialogRecyclerView;
-    private AddChatDialog addChatDialog;
+    private EditText editSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         drawerLayout = findViewById(R.id.drawer_layout);
-        setupRecyclerView();
-        viewModel = new ViewModelProvider(this).get(DialogsActivityViewModel.class);
-        viewModel.getChats().observe(this, list -> adapter.setAll(list));
-
-        final ProgressBar loadingPb = findViewById(R.id.dialog_loading_pb);
-        if (loadingPb!=null){
-            viewModel.getEndLoadingObservable().observe(this, (Void) ->{
-                loadingPb.setVisibility(View.INVISIBLE);
-            });
-            viewModel.getStartLoadingObservable().observe(this, (Void) ->{
-                loadingPb.setVisibility(View.VISIBLE);
-            });
-        }
-
+        editSearch = findViewById(R.id.edit_search);
         setupNavDrawer();
         setupToolbar();
-        setupFloatingButton();
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
-//        if (recManager != null) {
-//            outState.putParcelable(STR_RECYCLER_DATA, recManager.onSaveInstanceState());
-//        }
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        adapter = new DialogRecyclerAdapter();
-        dialogRecyclerView.setAdapter(adapter);
-//        if (dialogRecyclerView != null) {
-//            RecyclerView.LayoutManager recManager = dialogRecyclerView.getLayoutManager();
-//            if (recManager != null) {
-//                recManager.onRestoreInstanceState(savedInstanceState);
-//            }
-//        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        viewModel.startListening(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (search!=null && search.isVisible()){
-            search.hide();
-        }
-        viewModel.stopListening();
+        setupTabLayout();
     }
 
     @Override
@@ -125,9 +76,14 @@ public class DialogsActivity extends BaseActivity
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else if (search.getVisibility() == View.VISIBLE){
-           search.hide();
+        } else if (editSearch.getVisibility() == View.VISIBLE){
+            editSearch.setVisibility(View.GONE);
+            editSearch.setText("");
+            editSearch.getLayoutParams().width = 0;
+            editSearch.requestLayout();
+            if (!KeyboardUtil.hasHardwareKeyboard(this)) {
+                KeyboardUtil.hideKeyboard(editSearch);
+            }
         }
         else {
             super.onBackPressed();
@@ -161,33 +117,27 @@ public class DialogsActivity extends BaseActivity
                     drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.action_search:
-                if (search != null) {
-                    search.toggle();
+                if (editSearch != null){
+                    if (editSearch.getVisibility() == View.VISIBLE) {
+                        editSearch.setVisibility(View.GONE);
+                        editSearch.setText("");
+                        editSearch.getLayoutParams().width = 0;
+                        editSearch.requestLayout();
+                        if (!KeyboardUtil.hasHardwareKeyboard(this)) {
+                            KeyboardUtil.hideKeyboard(editSearch);
+                        }
+                    } else {
+                        editSearch.setVisibility(View.VISIBLE);
+                        editSearch.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        editSearch.requestLayout();
+                        if (!KeyboardUtil.hasHardwareKeyboard(this)) {
+                            KeyboardUtil.showKeyboard(editSearch);
+                        }
+                        editSearch.requestFocus();
+                    }
                 }
                 break;
         }
-        return true;
-    }
-
-
-    @Override
-    public void onItemClick(View view, Chat chat) {
-        ChatActivity.startActivity(this,chat.getId());
-    }
-
-    @Override
-    public boolean onLongItemClick(View view, Chat chat) {
-        PopupMenu pm = new PopupMenu(this,view);
-        pm.setGravity(Gravity.RIGHT);
-        pm.inflate(R.menu.menu_dialogs);
-        pm.setOnMenuItemClickListener(e ->{
-            if (e.getItemId() == R.id.message_delete){
-                viewModel.removeChat(chat);
-                return true;
-            }
-            return false;
-        });
-        pm.show();
         return true;
     }
 
@@ -222,48 +172,24 @@ public class DialogsActivity extends BaseActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == AddChatDialog.REQ_NEW_CHAT_PHOTO && addChatDialog != null){
-            addChatDialog.onDialogResult(requestCode,resultCode,data);
-        }
+//        if (requestCode == AddChatDialog.REQ_NEW_CHAT_PHOTO && addChatDialog != null){
+//            addChatDialog.onDialogResult(requestCode,resultCode,data);
+//        }
     }
 
-    private void setupRecyclerView() {
+    private void setupTabLayout() {
+        final TabLayout tabLayout = findViewById(R.id.tab_layout);
+        final ViewPager viewPager = findViewById(R.id.main_viewpager);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        dialogRecyclerView = findViewById(R.id.dialog_list_view);
-        if (dialogRecyclerView != null) {
-            dialogRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            adapter = new DialogRecyclerAdapter();
-            dialogRecyclerView.setAdapter(adapter);
-            adapter.setOnItemClickListener(this);
-        }
-        search = findViewById(R.id.edit_search);
-        if (search != null && dialogRecyclerView != null) {
-            search.link(adapter);
-        }
-    }
-    private void setupFloatingButton() {
-        final FloatingActionButton fab = findViewById(R.id.fab_dialogs);
+        viewPager.setAdapter(
+                new ChatsViewPagerAdapter(
+                        getSupportFragmentManager(),
+                        FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT,
+                        getString(R.string.title_chats),
+                        getString(R.string.title_channels)));
 
-        if (fab != null && adapter != null) {
-            fab.setOnClickListener(e -> {
-                addChatDialog = new AddChatDialog(DialogsActivity.this);
-                addChatDialog.show();
-            });
-        }
-        if (dialogRecyclerView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            dialogRecyclerView.setOnScrollChangeListener(
-                    (view, i, i1, i2, i3) -> {
-
-                        if (adapter.getItemCount() > 10) {
-                            if (i1 < i3) {
-                                fab.show();
-                            } else {
-                                fab.hide();
-                            }
-                        } else
-                            fab.show();
-                    });
-        }
+        tabLayout.setupWithViewPager(viewPager,true);
     }
 
 }

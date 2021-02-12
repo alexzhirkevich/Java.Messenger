@@ -10,8 +10,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Chat;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +23,6 @@ import com.messenger.app.BuildConfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,8 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DialogsActivityViewModel extends ViewModel {
 
     private final String TAG = DialogsActivityViewModel.class.getSimpleName();
-
-    private DialogsRepository repo = DialogsRepository.getInstance();
 
     private final MutableLiveData<List<Chat>> chats = new MutableLiveData<>();
     private final MutableLiveData<Void> loadingEnded = new MutableLiveData<>();
@@ -58,7 +55,7 @@ public class DialogsActivityViewModel extends ViewModel {
     }
 
     public void createChat(Chat chat){
-        repo.createChat(chat);
+        DialogsRepository.createChat(chat);
     }
 
     public void startListening(Context context) {
@@ -66,7 +63,7 @@ public class DialogsActivityViewModel extends ViewModel {
 
             loadingStarted.postValue(null);
 
-            DatabaseReference ref = repo.getChatIds();
+            DatabaseReference ref = DialogsRepository.getChatIds();
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -157,12 +154,12 @@ public class DialogsActivityViewModel extends ViewModel {
     }
 
     public void removeChat(Chat chat) {
-        repo.removeChat(chat);
+        DialogsRepository.removeChat(chat);
         stopObserve(chat.getId());
     }
 
     private void observeChat(String chatId, Context context){
-        DatabaseReference chatRef = repo.getChat(chatId);
+        DatabaseReference chatRef = DialogsRepository.getChat(chatId);
         chatRefs.put(chatId,chatRef);
         ValueEventListener listener = new ValueEventListener() {
             @Override
@@ -173,7 +170,7 @@ public class DialogsActivityViewModel extends ViewModel {
                     notifyDataChanged(observableChats.values());
                     Message lastMessage = chat.getLastMessage();
                 } else {
-                    repo.removeEmptyChatId(chatId);
+                    DialogsRepository.removeEmptyChatId(chatId);
                 }
 
                 if (observableChats.size() == chatCount){

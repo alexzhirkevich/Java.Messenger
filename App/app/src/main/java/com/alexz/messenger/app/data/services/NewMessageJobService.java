@@ -1,20 +1,13 @@
 package com.alexz.messenger.app.data.services;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
-import android.app.job.JobScheduler;
 import android.app.job.JobService;
-import android.app.job.JobWorkItem;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.NetworkRequest;
 import android.os.Build;
-import android.os.SystemClock;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
@@ -23,8 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Chat;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
 import com.alexz.messenger.app.util.FirebaseUtil;
@@ -43,15 +36,12 @@ import com.messenger.app.BuildConfig;
 import com.messenger.app.R;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class NewMessageJobService extends JobService {
 
     private static final String TAG = NewMessageService.class.getSimpleName();
-
-    private final DialogsRepository repo = DialogsRepository.getInstance();
 
     private final Map<String, DatabaseReference> chatRefs = new HashMap<>();
     private final Map<String, ValueEventListener> chatListeners = new HashMap<>();
@@ -85,7 +75,7 @@ public class NewMessageJobService extends JobService {
     private void startListening(){
         if (userChatsRefAndListener == null) {
 
-            DatabaseReference ref = repo.getChatIds();
+            DatabaseReference ref = DialogsRepository.getChatIds();
 
             ChildEventListener listener = new ChildEventListener() {
                 @Override
@@ -137,7 +127,7 @@ public class NewMessageJobService extends JobService {
     }
 
     private void observeChat(String chatId){
-        DatabaseReference chatRef = repo.getChat(chatId);
+        DatabaseReference chatRef = DialogsRepository.getChat(chatId);
         chatRefs.put(chatId,chatRef);
         ValueEventListener listener = new ValueEventListener() {
             @Override
@@ -149,7 +139,7 @@ public class NewMessageJobService extends JobService {
                         notifyNewMessage(chat);
                     }
                 } else {
-                    repo.removeEmptyChatId(chatId);
+                    DialogsRepository.removeEmptyChatId(chatId);
                 }
             }
 
@@ -202,7 +192,7 @@ public class NewMessageJobService extends JobService {
                 .setTitle(chat.getLastMessage().getSenderName())
                 .setText(chat.getLastMessage().getText())
                 .setAutoCancel(true)
-                .setIntent(ChatActivity.getIntent(NewMessageJobService.this, chat.getId()));
+                .setIntent(ChatActivity.getIntent(NewMessageJobService.this, chat.getId(),chat.getName(),chat.getImageUri()));
 
         if (chat.getImageUri() != null && !chat.getImageUri().isEmpty()) {
             Glide.with(NewMessageJobService.this).asBitmap().load(chat.getImageUri()).circleCrop().addListener(new RequestListener<Bitmap>() {

@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/drawable_dialogs_bg"
     android:foreground="?android:selectableItemBackground"
-    tools:context="com.alexz.messenger.app.data.model.Chat"
+    tools:context="com.alexz.messenger.app.data.model.imp.Chat"
     android:clickable="true"
     android:focusable="true">
 

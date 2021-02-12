@@ -1,21 +1,11 @@
 package com.alexz.messenger.app.data.repo;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.net.Uri;
-import android.webkit.MimeTypeMap;
-
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.Date;
 
 public class MessagesRepository {
 
@@ -61,6 +51,4 @@ public class MessagesRepository {
                 .child(item.getId())
                 .removeValue();
     }
-
-
 }

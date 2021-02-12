@@ -1,5 +1,6 @@
 package com.alexz.messenger.app.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -23,26 +24,26 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Chat;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.data.model.Result;
-import com.alexz.messenger.app.data.model.User;
 import com.alexz.messenger.app.ui.viewmodels.ChatActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.google.firebase.storage.StorageReference;
 import com.messenger.app.R;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.RecyclerItemClickListener;
+import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
 import com.alexz.messenger.app.ui.messages.MessageInput;
 import com.alexz.messenger.app.ui.messages.MessageFirebaseRecyclerAdapter;
-
-import java.util.Date;
 
 public class    ChatActivity extends BaseActivity
     implements MessageInput.OnSendListener, MessageInput.OnAttachListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String STR_PRIVATE = "private";
     private static final String EXTRA_CHAT_ID = "EXTRA_CHAT_ID";
+    private static final String EXTRA_CHAT_NAME = "EXTRA_CHAT_NAME";
+    private static final String EXTRA_CHAT_PHOTO = "EXTRA_CHAT_PHOTO";
+
     private static final int SELECT_PHOTO = 1001;
     private static final String STR_RECYCLER_DATA = "rec_data";
 
@@ -53,15 +54,19 @@ public class    ChatActivity extends BaseActivity
     private MessageFirebaseRecyclerAdapter adapter;;
     private ChatActivityViewModel viewModel;
 
-    public static void startActivity(Context context, String chatID) {
+    public static void startActivity(Context context, String chatID, String chatName, String chatPhotoUri) {
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(EXTRA_CHAT_ID, chatID);
+        intent.putExtra(EXTRA_CHAT_NAME, chatName);
+        intent.putExtra(EXTRA_CHAT_PHOTO, chatPhotoUri);
         context.startActivity(intent);
     }
 
-    public static Intent getIntent(Context context, String chatID){
+    public static Intent getIntent(Context context, String chatID, String chatName, String chatPhotoUri){
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(EXTRA_CHAT_ID, chatID);
+        intent.putExtra(EXTRA_CHAT_NAME, chatName);
+        intent.putExtra(EXTRA_CHAT_PHOTO, chatPhotoUri);
         return intent;
     }
 
@@ -70,30 +75,32 @@ public class    ChatActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-
-
         chatId = getIntent().getStringExtra(EXTRA_CHAT_ID);
+        String chatName = getIntent().getStringExtra(EXTRA_CHAT_NAME);
+        String chatPhoto = getIntent().getStringExtra(EXTRA_CHAT_PHOTO);
         viewModel = new ViewModelProvider(this).get(ChatActivityViewModel.class);
         viewModel.setChatId(chatId);
-        setupChatInfo(chatId);
+        viewModel.getChatInfoChangedLiveData().observe(this, chat -> setupChatInfo(chat.getId(),chat.getName(),chat.getImageUri()));
+        setupChatInfo(chatId,chatName,chatPhoto);
 
         setupRecyclerView();
         setupInput();
         setupToolbar();
+        mRecyclerView.postDelayed(() -> mRecyclerView.smoothScrollToPosition(mRecyclerView.getBottom()),200);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         adapter.startListening();
-        mRecyclerView.postDelayed(() -> mRecyclerView.smoothScrollToPosition(mRecyclerView.getBottom()),200);
-
+        viewModel.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         adapter.stopListening();
+        viewModel.stopListening();
     }
 
     @Override
@@ -129,14 +136,8 @@ public class    ChatActivity extends BaseActivity
             input.setText("");
             return;
         }
-        User user = FirebaseUtil.getCurrentUser();
-        Message m = new Message(
-                chatId,
-                user.getId(),
-                user.getName(),
-                user.getImageUri(),
-                new Date().getTime());
-        m.setText(input.getText().toString());
+        Message m = new Message(chatId);
+        m.setText(input.getText().toString().trim());
         m.setPrivate(isPrivate);
         viewModel.sendMessage(m);
         input.setText("");
@@ -211,6 +212,7 @@ public class    ChatActivity extends BaseActivity
 
     private RecyclerItemClickListener<Message> newItemClickListener() {
         return new RecyclerItemClickListener<Message>() {
+            @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onLongItemClick(View view, Message message) {
                 PopupMenu pm = new PopupMenu(ChatActivity.this, view);
@@ -228,13 +230,11 @@ public class    ChatActivity extends BaseActivity
                             return true;
                         case R.id.message_copy:
                             ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                            if (message != null) {
-                                String text = message.getText();
-                                ClipData cd = ClipData.newPlainText("Msg from " + message.getSenderId(), text);
-                                cm.setPrimaryClip(cd);
-                                Toast.makeText(ChatActivity.this, getString(R.string.action_message_copied), Toast.LENGTH_SHORT).show();
-                                return true;
-                            }
+                            String text = message.getText();
+                            ClipData cd = ClipData.newPlainText("Msg from " + message.getSenderId(), text);
+                            cm.setPrimaryClip(cd);
+                            Toast.makeText(ChatActivity.this, getString(R.string.action_message_copied), Toast.LENGTH_SHORT).show();
+                            return true;
                     }
                     return false;
                 });
@@ -283,37 +283,51 @@ public class    ChatActivity extends BaseActivity
         }
     }
 
-    private void setupChatInfo(String chatId) {
+    private void setupChatInfo(String chatId,String chatName, String chatPhoto) {
         final AvatarImageView avatarImageView = findViewById(R.id.chat_avatar);
         final TextView tvChatName = findViewById(R.id.chat_name);
-        FirebaseUtil.getChatInfo(chatId).addResultListener(new Result.ResultListener<Chat>() {
-            @Override
-            public void onSuccess(@NonNull Result.ISuccess<Chat> result) {
-                Chat chat = result.get();
-                if (chat != null) {
-                    isPrivate = !chat.isGroup();
-                    final String avatarUrl = chat.getImageUri();
-                    final String chatName = chat.getName();
+
+        boolean loadInfo = false;
+        if (tvChatName != null && chatName != null && !chatName.isEmpty()){
+            tvChatName.setText(chatName);
+        } else {
+            loadInfo = true;
+        }
+        if (avatarImageView != null && chatPhoto != null && !chatPhoto.isEmpty()){
+            avatarImageView.setImageURI(Uri.parse(chatPhoto));
+        } else {
+            loadInfo =true;
+        }
+        if (loadInfo) {
+            FirebaseUtil.getChatInfo(chatId).addResultListener(new Result.ResultListener<Chat>() {
+                @Override
+                public void onSuccess(@NonNull Result.ISuccess<Chat> result) {
+                    Chat chat = result.get();
+                    if (chat != null) {
+                        isPrivate = !chat.isGroup();
+                        final String avatarUrl = chat.getImageUri();
+                        final String chatName = chat.getName();
 
 
-                    if (tvChatName != null && chatName != null) {
-                        tvChatName.setText(chatName);
-                    }
-                    if (avatarImageView != null && avatarUrl != null) {
-                        avatarImageView.setImageURI(Uri.parse(avatarUrl));
+                        if (tvChatName != null && chatName != null) {
+                            tvChatName.setText(chatName);
+                        }
+                        if (avatarImageView != null && avatarUrl != null) {
+                            avatarImageView.setImageURI(Uri.parse(avatarUrl));
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onError(@Nullable Result.IError error) {
-                if (error != null) {
-                    Toast.makeText(ChatActivity.this, error.getError(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ChatActivity.this, R.string.error_chat_load, Toast.LENGTH_SHORT).show();
+                @Override
+                public void onError(@Nullable Result.IError error) {
+                    if (error != null) {
+                        Toast.makeText(ChatActivity.this, error.getError(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ChatActivity.this, R.string.error_chat_load, Toast.LENGTH_SHORT).show();
+                    }
+                    finish();
                 }
-                finish();
-            }
-        });
+            });
+        }
     }
 }

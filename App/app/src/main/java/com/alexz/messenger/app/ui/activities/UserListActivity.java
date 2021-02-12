@@ -1,13 +1,5 @@
 package com.alexz.messenger.app.ui.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,29 +10,26 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alexz.messenger.app.data.model.Chat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.alexz.messenger.app.data.model.Result;
-import com.alexz.messenger.app.data.model.User;
+import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
 import com.alexz.messenger.app.ui.userlist.UserListRecyclerAdapter;
-import com.alexz.messenger.app.ui.viewmodels.UserListViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.firebase.ui.database.ObservableSnapshotArray;
-import com.google.firebase.database.DataSnapshot;
 import com.messenger.app.R;
-
-import java.util.List;
 
 public class UserListActivity extends BaseActivity {
 
     private static final String EXTRA_CHAT_ID = "EXTRA_CHAT_ID";
 
-    private String chatId;
     private RecyclerView usersRecyclerView;
     private UserListRecyclerAdapter adapter;
-
-    private UserListViewModel viewModel;
 
     public static void startActivity(Context context, String chatID) {
         Intent starter = new Intent(context, UserListActivity.class);
@@ -53,25 +42,10 @@ public class UserListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
 
-        chatId = getIntent().getStringExtra(EXTRA_CHAT_ID);
-        viewModel = new ViewModelProvider(this).get(UserListViewModel.class);
-        viewModel.setChatId(chatId);
+        String chatId = getIntent().getStringExtra(EXTRA_CHAT_ID);
 
-        final ProgressBar pb = findViewById(R.id.user_loading_pb);
+        setupRecyclerView(chatId);
 
-        viewModel.getLoadingStarted().observe(this, Void ->{
-            pb.setVisibility(View.VISIBLE);
-        });
-
-        viewModel.getLoadingEnded().observe(this, Void ->{
-            pb.setVisibility(View.INVISIBLE);
-        });
-
-        viewModel.getUsersObservable().observe(this, users ->{
-            adapter.setAll(users);
-        });
-
-        setupRecyclerView();
         setupToolbar();
         setupChatInfo(chatId);
     }
@@ -88,17 +62,13 @@ public class UserListActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (viewModel!=null) {
-            viewModel.startListening();
-        }
+        adapter.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (viewModel!=null){
-            viewModel.stopListening();
-        }
+        adapter.stopListening();
     }
 
     private void setupToolbar() {
@@ -113,16 +83,18 @@ public class UserListActivity extends BaseActivity {
 
     }
 
-    private void setupRecyclerView() {
+    private void setupRecyclerView(String chatId) {
 
         usersRecyclerView = findViewById(R.id.user_recycler_view);
 
         if (usersRecyclerView != null) {
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             usersRecyclerView.setLayoutManager(layoutManager);
-
-            adapter = new UserListRecyclerAdapter();
+            adapter = new UserListRecyclerAdapter(chatId);
             usersRecyclerView.setAdapter(adapter);
+            final ProgressBar pb = findViewById(R.id.user_loading_pb);
+            adapter.setOnStartLoadingListener( () -> pb.setVisibility(View.VISIBLE));
+            adapter.setOnEndLoadingListener( () -> pb.setVisibility(View.GONE));
         }
     }
     private void setupChatInfo(String chatId) {

@@ -18,7 +18,7 @@
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
-        android:src="@drawable/drawable_circle"/>
+        android:src="@drawable/logo256"/>
 
     <RelativeLayout
         android:id="@+id/message_data_layout"
@@ -53,26 +53,28 @@
             android:layout_alignParentStart="true"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:paddingBottom="5dp"
+
             android:autoLink="web|phone|email"
             android:linksClickable="true"
             android:text="Text"
             android:textColor="@color/white"
             android:textSize="@dimen/message_text_size" />
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
+            app:shapeAppearanceOverlay="@style/roundedImageView"
             android:id="@+id/message_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/message_text"
             android:background="@android:color/transparent"
-            android:layout_marginStart="10dp"
             android:layout_alignParentStart="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
             android:clickable="true"
             android:focusable="true"
             android:longClickable="true"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo256"/>
 
         <TextView
             android:id="@+id/message_date"
@@ -80,12 +82,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/message_image"
             android:layout_marginBottom="5dp"
-            android:layout_alignStart="@id/message_text"
+            android:layout_alignParentStart="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:background="@android:color/transparent"
             android:inputType="time"
             android:maxLines="1"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
             android:text="13:37"
             android:textColor="@color/gray"
             android:textSize="@dimen/message_date_size" />

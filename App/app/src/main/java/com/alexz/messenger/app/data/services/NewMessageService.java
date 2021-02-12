@@ -2,32 +2,21 @@ package com.alexz.messenger.app.data.services;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.job.JobInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 
-import com.alexz.messenger.app.data.model.Chat;
-import com.alexz.messenger.app.data.model.Message;
+import com.alexz.messenger.app.data.model.imp.Chat;
+import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
 import com.alexz.messenger.app.util.FirebaseUtil;
@@ -51,8 +40,6 @@ import java.util.Map;
 public class NewMessageService extends Service {
 
     private static final String TAG = NewMessageService.class.getSimpleName();
-
-    private final DialogsRepository repo = DialogsRepository.getInstance();
 
     private final Map<String, DatabaseReference> chatRefs = new HashMap<>();
     private final Map<String, ValueEventListener> chatListeners = new HashMap<>();
@@ -81,7 +68,7 @@ public class NewMessageService extends Service {
     private void startListening(){
         if (userChatsRefAndListener == null) {
 
-            DatabaseReference ref = repo.getChatIds();
+            DatabaseReference ref = DialogsRepository.getChatIds();
 
             ChildEventListener listener = new ChildEventListener() {
                 @Override
@@ -133,7 +120,7 @@ public class NewMessageService extends Service {
     }
 
     private void observeChat(String chatId){
-        DatabaseReference chatRef = repo.getChat(chatId);
+        DatabaseReference chatRef = DialogsRepository.getChat(chatId);
         chatRefs.put(chatId,chatRef);
         ValueEventListener listener = new ValueEventListener() {
             @Override
@@ -145,7 +132,7 @@ public class NewMessageService extends Service {
                         notifyNewMessage(chat);
                     }
                 } else {
-                    repo.removeEmptyChatId(chatId);
+                    DialogsRepository.removeEmptyChatId(chatId);
                 }
             }
 
@@ -198,7 +185,7 @@ public class NewMessageService extends Service {
                 .setTitle(chat.getLastMessage().getSenderName())
                 .setText(chat.getLastMessage().getText())
                 .setAutoCancel(true)
-                .setIntent(ChatActivity.getIntent(NewMessageService.this, chat.getId()));
+                .setIntent(ChatActivity.getIntent(NewMessageService.this, chat.getId(),chat.getName(),chat.getImageUri()));
 
         if (chat.getImageUri() != null && !chat.getImageUri().isEmpty()) {
             Glide.with(NewMessageService.this).asBitmap().load(chat.getImageUri()).circleCrop().addListener(new RequestListener<Bitmap>() {

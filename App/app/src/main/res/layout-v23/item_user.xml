@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/color_background_dark"
+    android:background="@drawable/drawable_dialogs_bg"
     android:foreground="?attr/selectableItemBackground"
-    tools:context="com.alexz.messenger.app.data.model.Chat"
+    tools:context="com.alexz.messenger.app.data.model.imp.Chat"
     android:clickable="true"
     android:focusable="true">
 

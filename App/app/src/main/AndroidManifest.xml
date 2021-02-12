@@ -21,7 +21,7 @@
             android:label="@string/menu_settings" />
         <activity
             android:name="com.alexz.messenger.app.ui.activities.FullscreenImageActivity"
-            android:label="@string/photo" />
+            android:label="@string/title_photo" />
         <activity
             android:name="com.alexz.messenger.app.ui.activities.ChatActivity"
             android:label=""

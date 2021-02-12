@@ -6,9 +6,9 @@
     <item
         android:id="@+id/nav_account"
         android:icon="@drawable/ic_account"
-        android:title="@string/account" />
+        android:title="@string/title_account" />
 
-    <item android:title="@string/properties" >
+    <item android:title="@string/title_properties" >
         <menu>
             <item
                 android:id="@+id/nav_settings"
