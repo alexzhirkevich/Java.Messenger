@@ -1,27 +1,21 @@
 package com.alexz.messenger.app.ui.chats;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -31,16 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
-import com.alexz.messenger.app.ui.activities.DialogsActivity;
-import com.alexz.messenger.app.ui.common.AvatarImageView;
 import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
 import com.alexz.messenger.app.ui.dialogwindows.AddChatDialog;
 import com.alexz.messenger.app.ui.viewmodels.DialogsActivityViewModel;
-import com.alexz.messenger.app.util.FirebaseUtil;
 import com.alexz.messenger.app.util.KeyboardUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseUser;
 import com.messenger.app.R;
 
 public class ChatsFragment extends Fragment implements RecyclerItemClickListener<Chat> {
@@ -115,7 +104,7 @@ public class ChatsFragment extends Fragment implements RecyclerItemClickListener
 
     @Override
     public void onItemClick(View view, Chat chat) {
-        ChatActivity.startActivity(getActivity(),chat.getId(),chat.getName(),chat.getImageUri());
+        ChatActivity.startActivity(getActivity(),chat);
     }
 
     @Override
@@ -167,7 +156,7 @@ public class ChatsFragment extends Fragment implements RecyclerItemClickListener
 
         final ProgressBar loadingPb = view.findViewById(R.id.dialog_loading_pb);
 
-        dialogRecyclerView = view.findViewById(R.id.dialog_list_view);
+        dialogRecyclerView = view.findViewById(R.id.dialog_rec_view);
         if (dialogRecyclerView != null) {
             dialogRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             adapter = new ChatRecyclerAdapter();

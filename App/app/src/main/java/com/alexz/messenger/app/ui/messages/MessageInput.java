@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.messenger.app.R;
 
@@ -15,6 +17,7 @@ public class MessageInput extends LinearLayout {
     private ImageButton send;
     private ImageButton attach;
     private TextView input;
+    private ProgressBar progressBar;
 
     private OnSendListener sendListener;
     private OnAttachListener attachListener;
@@ -36,7 +39,7 @@ public class MessageInput extends LinearLayout {
 
     public void setOnSendListener(OnSendListener listener){
         this.sendListener = listener;
-        send.setOnClickListener( e -> listener.OnSendClicked(send,input));
+        send.setOnClickListener( e -> listener.onSendClicked(send,input));
     }
 
     public OnSendListener getOnSendListener() {
@@ -49,7 +52,7 @@ public class MessageInput extends LinearLayout {
 
     public void setOnAttachListener(OnAttachListener listener){
         this.attachListener = listener;
-        attach.setOnClickListener( e -> listener.OnAttachClicked(attach,input));
+        attach.setOnClickListener( e -> listener.onAttachClicked(attach,input));
     }
 
     public OnAttachListener getOnAttachListener() {
@@ -72,20 +75,27 @@ public class MessageInput extends LinearLayout {
         return input;
     }
 
+    public ProgressBar getProgressBar() {
+        return progressBar;
+    }
+
     private void init(Context context){
         inflate(context, R.layout.view_message_input,this);
         send = findViewById(R.id.button_message_send);
         input = findViewById(R.id.edit_message_input);
         attach = findViewById(R.id.button_message_attach);
+        progressBar = findViewById(R.id.input_attach_progress);
+
+        attach.setColorFilter(ContextCompat.getColor(attach.getContext(),R.color.color_primary));
     }
 
     @FunctionalInterface
     public interface OnSendListener {
-        void OnSendClicked(ImageButton btn, TextView input);
+        void onSendClicked(ImageButton btn, TextView input);
     }
 
     @FunctionalInterface
     public interface OnAttachListener {
-        void OnAttachClicked(ImageButton btn,  TextView input);
+        void onAttachClicked(ImageButton btn, TextView input);
     }
 }

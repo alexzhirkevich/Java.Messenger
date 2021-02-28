@@ -31,13 +31,13 @@
     <string name="title_message">Сообщение</string>
     <string name="title_photo">Фото</string>
     <string name="title_properties">Настройки</string>
-
     <string name="title_remove_photo">Удалить фото</string>
     <string name="title_chats">Чаты</string>
     <string name="title_channels">Каналы</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_signature">Your signature</string>
     <string name="title_reply">Default reply action</string>
+    <string name="title_file">Файл</string>
 
     <string name="open">open</string>
     <string name="close">close</string>

@@ -96,6 +96,7 @@ public class Message extends BaseModel implements IMessage, Parcelable {
         return isPrivate;
     }
 
+    @Override
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
@@ -110,22 +111,27 @@ public class Message extends BaseModel implements IMessage, Parcelable {
         this.senderId = senderId;
     }
 
+    @Override
     public void setSenderName(String senderName) {
         this.senderName = senderName;
     }
 
+    @Override
     public String getSenderName() {
         return senderName;
     }
 
+    @Override
     public void setSenderPhotoUrl(String senderPhotoUrl) {
         this.senderPhotoUrl = senderPhotoUrl;
     }
 
+    @Override
     public String getSenderPhotoUrl() {
         return senderPhotoUrl;
     }
 
+    @Override
     public String getChatId(){
         return chatId;
     }

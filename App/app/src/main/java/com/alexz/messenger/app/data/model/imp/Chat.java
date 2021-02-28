@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.alexz.messenger.app.data.model.interfaces.IChat;
+import com.alexz.messenger.app.data.model.interfaces.IMessage;
 import com.alexz.messenger.app.util.FirebaseUtil;
 
 public class Chat extends BaseModel implements Parcelable, IChat, Comparable<Chat>{

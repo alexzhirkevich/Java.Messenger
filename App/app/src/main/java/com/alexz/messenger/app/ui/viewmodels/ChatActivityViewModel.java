@@ -3,6 +3,7 @@ package com.alexz.messenger.app.ui.viewmodels;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -81,8 +82,8 @@ public class ChatActivityViewModel extends ViewModel implements Listenable {
         return null;
     }
 
-    public void sendMessage(Message m){
-        MessagesRepository.sendMessage(m);
+    public void sendMessage(Message m, @Nullable String replace){
+        MessagesRepository.sendMessage(m,replace);
     }
 
     public void deleteMessage(Message m){

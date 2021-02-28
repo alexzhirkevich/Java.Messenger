@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardElevation="7dp">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="?android:selectableItemBackground"
-    tools:context="com.alexz.messenger.app.data.model.imp.Chat"
-    android:clickable="true"
-    android:focusable="true">
+    tools:context="com.alexz.messenger.app.data.model.imp.Chat">
+
 
     <com.alexz.messenger.app.ui.common.AvatarImageView
         android:id="@+id/user_avatar"
@@ -44,5 +48,5 @@
         android:layout_alignStart="@id/user_name"
         android:layout_below="@id/user_name" />
 
-
 </RelativeLayout>
+</androidx.cardview.widget.CardView>

@@ -70,7 +70,7 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
         }
     }
 
-    public class FindChatDialog extends AlertDialog
+    public static class FindChatDialog extends AlertDialog
             implements View.OnClickListener, TextWatcher, TextView.OnEditorActionListener {
 
         private final EditText editId;
@@ -125,7 +125,7 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
         }
     }
 
-    public class NewChatDialog extends AlertDialog
+    public static class NewChatDialog extends AlertDialog
             implements View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, DialogResult{
 
         private final EditText editName;
@@ -182,7 +182,7 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
                     onBackPressed();
                     Chat c = new Chat(imageUri.toString(), name, true);
                     DialogsRepository.createChat(c);
-                    ChatActivity.startActivity(getContext(), c.getId(),c.getName(),c.getImageUri());
+                    ChatActivity.startActivity(getContext(), c);
 
                 } else {
                     Toast.makeText(getContext(), R.string.error_empty_input, Toast.LENGTH_LONG).show();

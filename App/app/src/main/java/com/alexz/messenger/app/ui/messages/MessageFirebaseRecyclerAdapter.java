@@ -241,9 +241,7 @@ public class MessageFirebaseRecyclerAdapter
                     }
 
                     @Override
-                    public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {
-
-                    }
+                    public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) { }
                 }).addListener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
@@ -306,7 +304,11 @@ public class MessageFirebaseRecyclerAdapter
                 textParams.setMargins(0, topMargin, 0, 0);
                 dataParams.setMarginStart(MetrixUtil.dpToPx(msgData.getContext(), 50));
                 if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
-                    imageParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    if (message.getText() == null || message.getText().isEmpty()) {
+                        imageParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    } else{
+                        imageParams.addRule(RelativeLayout.BELOW, R.id.message_text);
+                    }
                 } else {
                     dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
                 }

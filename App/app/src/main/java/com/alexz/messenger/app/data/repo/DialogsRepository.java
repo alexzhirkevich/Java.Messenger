@@ -65,7 +65,7 @@ public class DialogsRepository {
                             FirebaseDatabase.getInstance().getReference()
                                     .child(FirebaseUtil.CHATS)
                                     .child(chatId).child(FirebaseUtil.USERS).child(id).setValue("");
-                            ChatActivity.startActivity(openContext,chatId,"","");
+                            //ChatActivity.startActivity(openContext,getChat);
                             if (BuildConfig.DEBUG) {
                                 Log.e("FIND CHAT", "SUCCESS: Chat added");
                             }

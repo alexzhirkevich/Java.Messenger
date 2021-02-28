@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.imp.Message;
+import com.alexz.messenger.app.data.model.interfaces.IMessage;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -168,7 +169,7 @@ public class DialogsActivityViewModel extends ViewModel {
                 if (chat !=null){
                     observableChats.put(chatId,chat);
                     notifyDataChanged(observableChats.values());
-                    Message lastMessage = chat.getLastMessage();
+                    IMessage lastMessage = chat.getLastMessage();
                 } else {
                     DialogsRepository.removeEmptyChatId(chatId);
                 }

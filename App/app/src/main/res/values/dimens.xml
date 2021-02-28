@@ -15,6 +15,7 @@
     <dimen name="dialog_message_size">15sp</dimen>
     <dimen name="dialog_date_size">12sp</dimen>
     <dimen name="dialog_unread_size">12sp</dimen>
+    <dimen name="dialog_cardview_elevation">7dp</dimen>
 
     <dimen name="chat_name_text_size">20sp</dimen>
     <dimen name="chat_message_space">20dp</dimen>

@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <FrameLayout
+        android:layout_width="@dimen/message_input_height"
+        android:layout_height="@dimen/message_input_height"
+        android:layout_marginStart="5dp" >
+    <ProgressBar
+        android:id="@+id/input_attach_progress"
+        android:layout_width="@dimen/message_input_height"
+        android:layout_height="@dimen/message_input_height"
+        android:indeterminateDrawable="@drawable/progressbar"
+        android:visibility="invisible"/>
     <ImageButton
         android:id="@+id/button_message_attach"
         android:background="@android:color/transparent"
@@ -13,9 +23,10 @@
         android:layout_gravity="bottom"
         android:src="@drawable/ic_attach"
         android:padding="10dp"
-        android:scaleType="centerCrop"
-        android:tint="?attr/colorPrimary"
-        android:layout_marginStart="5dp" />
+        android:scaleType="fitCenter"
+        android:layout_marginStart="1dp"
+        android:layout_marginBottom="1dp"/>
+    </FrameLayout>
 
 
     <EditText

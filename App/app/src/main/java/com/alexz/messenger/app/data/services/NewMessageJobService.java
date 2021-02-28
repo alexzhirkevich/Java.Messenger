@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi;
 
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.imp.Message;
+import com.alexz.messenger.app.data.model.interfaces.IMessage;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
 import com.alexz.messenger.app.util.FirebaseUtil;
@@ -134,7 +135,7 @@ public class NewMessageJobService extends JobService {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Chat chat = snapshot.getValue(Chat.class);
                 if (chat !=null){
-                    Message lastMessage = chat.getLastMessage();
+                    IMessage lastMessage = chat.getLastMessage();
                     if (lastMessage != null && !lastMessage.getSenderId().equals(FirebaseUtil.getCurrentUser().getId())){
                         notifyNewMessage(chat);
                     }
@@ -192,7 +193,7 @@ public class NewMessageJobService extends JobService {
                 .setTitle(chat.getLastMessage().getSenderName())
                 .setText(chat.getLastMessage().getText())
                 .setAutoCancel(true)
-                .setIntent(ChatActivity.getIntent(NewMessageJobService.this, chat.getId(),chat.getName(),chat.getImageUri()));
+                .setIntent(ChatActivity.getIntent(NewMessageJobService.this, chat));
 
         if (chat.getImageUri() != null && !chat.getImageUri().isEmpty()) {
             Glide.with(NewMessageJobService.this).asBitmap().load(chat.getImageUri()).circleCrop().addListener(new RequestListener<Bitmap>() {

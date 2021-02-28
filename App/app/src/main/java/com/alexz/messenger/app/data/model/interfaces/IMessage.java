@@ -8,6 +8,12 @@ public interface IMessage {
     String getSenderId();
     void setSenderId(String sender);
 
+    String getSenderName();
+    void setSenderName(String name);
+
+    String getSenderPhotoUrl();
+    void setSenderPhotoUrl(String uri);
+
     String getText();
     void setText(String text);
 

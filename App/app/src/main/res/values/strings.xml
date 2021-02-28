@@ -38,6 +38,8 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_signature">Your signature</string>
     <string name="title_reply">Default reply action</string>
+    <string name="title_file">File</string>
+
 
     <string name="open">open</string>
     <string name="close">close</string>

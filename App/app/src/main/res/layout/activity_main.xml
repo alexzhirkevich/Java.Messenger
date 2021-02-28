@@ -71,51 +71,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-<!--        </com.google.android.material.appbar.AppBarLayout>-->
-
-        <!--    DIALOGS      -->
-<!--        <RelativeLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:id="@+id/fragment_dialog">-->
-
-<!--                <androidx.recyclerview.widget.RecyclerView-->
-<!--                    android:id="@+id/dialog_list_view"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:scrollbars="vertical"-->
-<!--                    android:scrollbarStyle="outsideOverlay"-->
-<!--                    android:fadeScrollbars="true"-->
-<!--                    android:scrollbarSize="2dp"-->
-<!--                    tools:listitem="@layout/item_dialog"-->
-<!--                    android:scrollbarThumbVertical="@color/gray"/>-->
-
-<!--            <ProgressBar-->
-<!--                android:id="@+id/dialog_loading_pb"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:indeterminateDrawable="@drawable/progressbar"-->
-<!--                android:layout_marginTop="50dp"-->
-<!--                android:visibility="invisible"-->
-<!--                android:layout_centerInParent="true" />-->
-
-<!--            <com.alexz.messenger.app.ui.chats.DialogFloatingButton-->
-<!--                android:id="@+id/fab_dialogs"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:layout_alignParentBottom="true"-->
-<!--                android:layout_gravity="bottom|end"-->
-<!--                android:layout_marginStart="@dimen/fab_margin"-->
-<!--                android:layout_marginTop="@dimen/fab_margin"-->
-<!--                android:layout_marginEnd="10dp"-->
-<!--                android:layout_marginBottom="15dp"-->
-<!--                android:src="@drawable/ic_pen"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent" />-->
-
-<!--            </RelativeLayout>-->
-
     </RelativeLayout>
 
     <!--    DRAWER      -->

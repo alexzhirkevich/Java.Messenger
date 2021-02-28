@@ -64,6 +64,7 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
         holder.itemView.setClickable(true);
         holder.itemView.setFocusable(true);
         holder.itemView.setLongClickable(true);
+        holder.itemView.requestLayout();
         holder.itemView.setOnClickListener(view ->{
             if (itemClickListener != null){
                 itemClickListener.onItemClick(view,holder.getModel());

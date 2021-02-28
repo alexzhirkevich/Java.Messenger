@@ -1,5 +1,7 @@
 package com.alexz.messenger.app.data.repo;
 
+import androidx.annotation.Nullable;
+
 import com.alexz.messenger.app.data.model.imp.Message;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.google.android.gms.tasks.Task;
@@ -24,7 +26,7 @@ public class MessagesRepository {
                 .get();
     }
 
-    public static void sendMessage(Message m){
+    public static void sendMessage(Message m, @Nullable String replaceText){
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.CHATS)
@@ -33,7 +35,9 @@ public class MessagesRepository {
         m.setId(ref.getKey());
         m.setSenderId(FirebaseUtil.getCurrentUser().getId());
         ref.setValue(m);
-
+        if (m.getText() == null || m.getText().isEmpty()){
+            m.setText(replaceText);
+        }
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.CHATS)
                 .child(m.getChatId())
