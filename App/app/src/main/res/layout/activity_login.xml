@@ -48,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="example"
+            android:visibility="invisible"
             android:textAlignment="center"
             android:textSize="30sp" />
 
@@ -64,6 +65,7 @@
                 android:padding="20dp"
                 android:layout_height="wrap_content"
                 android:text="button1"
+                android:visibility="invisible"
                 android:background="@color/green"/>
 
             <Button
@@ -72,6 +74,7 @@
                 android:padding="20dp"
                 android:layout_height="wrap_content"
                 android:text="button2"
+                android:visibility="invisible"
                 android:background="@color/red"/>
 
         </LinearLayout>

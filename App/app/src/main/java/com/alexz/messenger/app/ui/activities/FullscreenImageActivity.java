@@ -1,6 +1,7 @@
 package com.alexz.messenger.app.ui.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.ZoomControls;
 
 import com.bumptech.glide.Glide;
 import com.messenger.app.R;
@@ -35,16 +37,16 @@ public class FullscreenImageActivity extends AppCompatActivity {
             Glide.with(this).load(uri).into(imageView);
         }
 
-        if (imageView!=null) {
-            imageView.setOnClickListener(view -> {
-               if (getSupportActionBar().isShowing()) {
-                   getSupportActionBar().hide();
-               }
-               else {
-                   getSupportActionBar().show();
-               }
-            });
-        }
+//        if (imageView!=null) {
+//            imageView.setOnClickListener(view -> {
+//               if (getSupportActionBar().isShowing()) {
+//                   getSupportActionBar().hide();
+//               }
+//               else {
+//                   getSupportActionBar().show();
+//               }
+//            });
+//        }
     }
 
     @Override
@@ -55,9 +57,13 @@ public class FullscreenImageActivity extends AppCompatActivity {
         return true;
     }
 
-    public static void startActivity(Context context, String imageUri) {
+    public static void startActivity(Context context, String imageUri,@Nullable  Bundle bundle) {
         Intent intent = new Intent(context, FullscreenImageActivity.class);
         intent.putExtra(EXTRA_IMAGE_URI,imageUri);
-        context.startActivity(intent);
+        if (bundle == null) {
+            context.startActivity(intent);
+        } else{
+            context.startActivity(intent,bundle);
+        }
     }
 }

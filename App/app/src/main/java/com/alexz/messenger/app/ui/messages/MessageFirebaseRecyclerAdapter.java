@@ -2,8 +2,6 @@ package com.alexz.messenger.app.ui.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,8 +16,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.view.GravityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexz.messenger.app.data.model.imp.Message;
@@ -38,7 +34,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.messenger.app.R;;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
+import com.alexz.messenger.app.ui.common.ItemClickListener;
 
 import java.security.MessageDigest;
 import java.util.Date;
@@ -46,44 +42,44 @@ import java.util.Date;
 public class MessageFirebaseRecyclerAdapter
         extends FirebaseRecyclerAdapter<Message, MessageFirebaseRecyclerAdapter.MessageViewHolder> {
 
-    private RecyclerItemClickListener<Message> imageClickListener = null;
-    private RecyclerItemClickListener<Message> avatarClickListener = null;
-    private RecyclerItemClickListener<Message> nameClickListener = null;
-    private RecyclerItemClickListener<Message> onItemClickListener = null;
+    private ItemClickListener<Message> imageClickListener = null;
+    private ItemClickListener<Message> avatarClickListener = null;
+    private ItemClickListener<Message> nameClickListener = null;
+    private ItemClickListener<Message> onItemClickListener = null;
 
     public MessageFirebaseRecyclerAdapter(@NonNull FirebaseRecyclerOptions<Message> options) {
         super(options);
     }
 
-    public void setOnItemClickListener(RecyclerItemClickListener<Message> onItemClickListener) {
+    public void setOnItemClickListener(ItemClickListener<Message> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
-    public RecyclerItemClickListener<Message> getOnItemClickListener() {
+    public ItemClickListener<Message> getOnItemClickListener() {
         return onItemClickListener;
     }
 
-    public void setImageClickListener(RecyclerItemClickListener<Message> imageClickListener) {
+    public void setImageClickListener(ItemClickListener<Message> imageClickListener) {
         this.imageClickListener = imageClickListener;
     }
 
-    public RecyclerItemClickListener<Message> getImageClickListener() {
+    public ItemClickListener<Message> getImageClickListener() {
         return imageClickListener;
     }
 
-    public void setNameClickListener(RecyclerItemClickListener<Message> nameClickListener) {
+    public void setNameClickListener(ItemClickListener<Message> nameClickListener) {
         this.nameClickListener = nameClickListener;
     }
 
-    public RecyclerItemClickListener<Message> getNameClickListener() {
+    public ItemClickListener<Message> getNameClickListener() {
         return nameClickListener;
     }
 
-    public void setAvatarClickListener(RecyclerItemClickListener<Message> avatarClickListener) {
+    public void setAvatarClickListener(ItemClickListener<Message> avatarClickListener) {
         this.avatarClickListener = avatarClickListener;
     }
 
-    public RecyclerItemClickListener<Message> getAvatarClickListener() {
+    public ItemClickListener<Message> getAvatarClickListener() {
         return avatarClickListener;
     }
 
@@ -111,8 +107,7 @@ public class MessageFirebaseRecyclerAdapter
         private final TextView text;
         private final ImageView image;
         private final TextView date;
-
-        private final int topMargin;
+        private final int textVerticalMargin;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -178,7 +173,8 @@ public class MessageFirebaseRecyclerAdapter
             text = itemView.findViewById(R.id.message_text);
             date = itemView.findViewById(R.id.message_date);
             msgData = itemView.findViewById(R.id.message_data_layout);
-            topMargin = MetrixUtil.dpToPx(itemView.getContext(), 10);
+
+            textVerticalMargin = (int)text.getResources().getDimension(R.dimen.message_text_vertical_margin);
         }
 
         private void bind(Message message) {
@@ -279,19 +275,19 @@ public class MessageFirebaseRecyclerAdapter
         private void transformLayoutParams(Message message,boolean outcoming){
 
             RelativeLayout.LayoutParams dataParams = (RelativeLayout.LayoutParams) msgData.getLayoutParams();
-            RelativeLayout.LayoutParams dateParams = (RelativeLayout.LayoutParams) date.getLayoutParams();
+            //RelativeLayout.LayoutParams dateParams = (RelativeLayout.LayoutParams) date.getLayoutParams();
             RelativeLayout.LayoutParams textParams = (RelativeLayout.LayoutParams) text.getLayoutParams();
             RelativeLayout.LayoutParams imageParams = (RelativeLayout.LayoutParams) image.getLayoutParams();
 
-            dateParams.addRule(RelativeLayout.BELOW,R.id.message_image);
+            //dateParams.addRule(RelativeLayout.BELOW,R.id.message_image);
             imageParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
-            imageParams.addRule(RelativeLayout.BELOW,R.id.message_text);
-            dataParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
+            imageParams.removeRule(RelativeLayout.BELOW);
             dataParams.removeRule(RelativeLayout.END_OF);
+            dataParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
             dataParams.removeRule(RelativeLayout.ALIGN_PARENT_START);
             textParams.removeRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY);
             textParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
-            textParams.setMargins(0, 0, 0, 0);
+            textParams.removeRule(RelativeLayout.BELOW);
             dataParams.setMarginEnd(0);
             dataParams.setMarginStart(0);
 
@@ -299,9 +295,9 @@ public class MessageFirebaseRecyclerAdapter
                 msgData.setBackgroundColor(msgData.getResources().getColor(R.color.message_outcoming));
                 msgData.setBackground(AppCompatResources.getDrawable(msgData.getContext(), R.drawable.drawable_message_outcoming));
                 dataParams.addRule(RelativeLayout.ALIGN_PARENT_END);
-                textParams.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, GravityCompat.END);
+                //textParams.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, GravityCompat.END);
                 textParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                textParams.setMargins(0, topMargin, 0, 0);
+                textParams.setMargins(textParams.leftMargin,textVerticalMargin,textParams.rightMargin,textParams.bottomMargin);
                 dataParams.setMarginStart(MetrixUtil.dpToPx(msgData.getContext(), 50));
                 if (message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
                     if (message.getText() == null || message.getText().isEmpty()) {
@@ -310,31 +306,40 @@ public class MessageFirebaseRecyclerAdapter
                         imageParams.addRule(RelativeLayout.BELOW, R.id.message_text);
                     }
                 } else {
-                    dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                    //dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
                 }
             } else {
                 msgData.setBackgroundColor(msgData.getResources().getColor(R.color.message_incoming));
                 dataParams.setMarginEnd(MetrixUtil.dpToPx(msgData.getContext(), 50));
-                textParams.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, GravityCompat.START);
+                //textParams.addRule(RelativeLayout.TEXT_ALIGNMENT_GRAVITY, GravityCompat.START);
                 dataParams.addRule(RelativeLayout.END_OF, R.id.message_avatar);
                 if (message.isPrivate()) {
                     msgData.setBackground(AppCompatResources.getDrawable(msgData.getContext(), R.drawable.drawable_message_incoming_private));
-                    dataParams.addRule(RelativeLayout.ALIGN_PARENT_START);
-                    textParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    textParams.setMargins(0, topMargin, 0, 0);
                 } else {
                     msgData.setBackground(AppCompatResources.getDrawable(msgData.getContext(), R.drawable.drawable_message_incoming_group));
                 }
                 if (message.getText() == null || message.getText().isEmpty()){
-                    imageParams.addRule(RelativeLayout.BELOW,R.id.message_sender);
+                    if (message.isPrivate()){
+                        imageParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    } else {
+                        imageParams.addRule(RelativeLayout.BELOW, R.id.message_sender);
+                    }
                 } else {
-                    dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                   //dateParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                    imageParams.addRule(RelativeLayout.BELOW,R.id.message_text);
+                    if (message.isPrivate()) {
+                        textParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                        textParams.setMargins(textParams.leftMargin,textVerticalMargin,textParams.rightMargin,textParams.bottomMargin);
+                    } else{
+                        textParams.addRule(RelativeLayout.BELOW,R.id.message_sender);
+                        textParams.setMargins(textParams.leftMargin,0,textParams.rightMargin,textParams.bottomMargin);
+                    }
                 }
             }
             msgData.requestLayout();
             text.requestLayout();
             image.requestLayout();
-            date.requestLayout();
+            //date.requestLayout();
         }
     }
 }

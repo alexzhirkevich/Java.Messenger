@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alexz.messenger.app.data.model.Result;
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
+import com.alexz.messenger.app.ui.common.firerecyclerview.LoadingCallback;
 import com.alexz.messenger.app.ui.userlist.UserListRecyclerAdapter;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.messenger.app.R;
@@ -93,8 +94,13 @@ public class UserListActivity extends BaseActivity {
             adapter = new UserListRecyclerAdapter(chatId);
             usersRecyclerView.setAdapter(adapter);
             final ProgressBar pb = findViewById(R.id.user_loading_pb);
-            adapter.setOnStartLoadingListener( () -> pb.setVisibility(View.VISIBLE));
-            adapter.setOnEndLoadingListener( () -> pb.setVisibility(View.GONE));
+            adapter.setLoadingCallback(new LoadingCallback() {
+                @Override
+                public void onStartLoading() { pb.setVisibility(View.VISIBLE); }
+
+                @Override
+                public void onEndLoading() { pb.setVisibility(View.GONE); }
+            });
         }
     }
     private void setupChatInfo(String chatId) {

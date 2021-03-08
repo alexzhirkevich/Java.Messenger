@@ -3,12 +3,22 @@ package com.alexz.messenger.app.ui.common.firerecyclerview;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alexz.messenger.app.data.model.interfaces.IBaseModel;
 import com.google.firebase.database.Query;
 
-public interface IFirebaseMapRecyclerAdapter<Model extends IBaseModel,VH extends IFirebaseMapViewHolder<Model>> {
+/**
+ * RecyclerView adapter for Firebase Realtime Database objects stored by key
+ * @param <Model> - object;
+ * @param <VH> - ViewHolder;
+ *
+ * @see IBaseModel
+ * @see IFirebaseViewHolder
+ * */
+public interface IFirebaseMapRecyclerAdapter<Model extends IBaseModel,VH extends IFirebaseViewHolder<Model>>
+        extends IFirebaseRecyclerAdapter<Model,VH> {
 
     /**
      * @return Firebase {@link Query} object for Models key set
@@ -24,50 +34,14 @@ public interface IFirebaseMapRecyclerAdapter<Model extends IBaseModel,VH extends
      * @see IBaseModel#getId() - key
      */
     @NonNull
-    Query onCreateModelQuery(String modelId);
+    Query onCreateModelQuery(@NonNull String modelId);
 
 
 
     /**
-     * Same as {@link RecyclerView.Adapter#onCreateViewHolder(ViewGroup, int)}
-     *
-     * Used in{@link FirebaseMapRecyclerAdapter#onCreateViewHolder(ViewGroup, int)}
-     *
-     * @return {@link FirebaseMapViewHolder}
-     * @see IFirebaseMapViewHolder
+     *  Called when model DataSnapshot, got by key, not exists
+     * @see IBaseModel#getId() - key
+     * @see com.google.firebase.database.DataSnapshot
      */
-    @NonNull
-    VH onCreateClickableViewHolder(@NonNull ViewGroup parent, int viewType);
-
-    /**
-     * Used in {@link FirebaseMapRecyclerAdapter#select(String, boolean)}
-     * @see IFirebaseMapRecyclerAdapter#select(String, boolean)
-     *
-     * @param model implements {@link IBaseModel}
-     *
-     * @return Model field for selection
-     */
-    @NonNull
-    default String onGetFieldForSelection(Model model) { return model.getId(); }
-
-
-
-    /**
-     * Shows only those ViewHolders, which key field contains {@param containsString}
-     * @see IBaseModel#getId() - default key field
-     * @see IFirebaseMapRecyclerAdapter#onGetFieldForSelection(IBaseModel): override to set up field for selection
-     *
-     * @param containsString substring to find.
-     * @param ignoreCase ignore case in key field and <b>containsString</b>
-     *
-     * @return selected ViewHolders count
-     */
-    int select(String containsString, boolean ignoreCase);
-
-
-
-    /**
-     * Shows all ViewHolders
-     */
-    void selectAll();
+    void onModelNotFound(@NonNull String modelId);
 }

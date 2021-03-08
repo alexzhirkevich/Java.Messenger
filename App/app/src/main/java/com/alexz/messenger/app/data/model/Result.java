@@ -2,13 +2,10 @@ package com.alexz.messenger.app.data.model;
 
 import android.os.Handler;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.UiThread;
-
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,10 +48,10 @@ public abstract class Result<T> {
         private Future() { }
 
         @Override
-        public void addResultListener(ResultListener<T> listener) { listeners.add(listener); }
+        public boolean addResultListener(ResultListener<T> listener) { return listeners.add(listener); }
 
         @Override
-        public void removeResultListener(ResultListener<T> listener){ listeners.remove(listener); }
+        public boolean removeResultListener(ResultListener<T> listener){ return listeners.remove(listener); }
 
         @Override
         public void clearResultListeners() { listeners.clear(); }
@@ -65,7 +62,11 @@ public abstract class Result<T> {
         }
     }
 
+
+
     public static class MutableFuture<T> extends Result.Future<T> implements IFuture<T>, IMutable<T> {
+
+        private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
         @Override
         public void setHasProgress(boolean hasProgress) {
@@ -77,11 +78,11 @@ public abstract class Result<T> {
             if (!listeners.isEmpty()) {
                 if (result instanceof ISuccess) {
                     for (ResultListener<T> listener : listeners) {
-                        new Handler(Looper.getMainLooper()).post(() -> listener.onSuccess((Success<T>) result));
+                        uiHandler.post(() -> listener.onSuccess((Success<T>) result));
                     }
                 } else if (result instanceof IError) {
                     for (ResultListener<T> listener : listeners) {
-                        new Handler(Looper.getMainLooper()).post(() -> listener.onError((Error) result));
+                        uiHandler.post(() -> listener.onError((Error) result));
                     }
                 } else {
                     throw new IllegalArgumentException("Future can not be result of Future");
@@ -93,7 +94,7 @@ public abstract class Result<T> {
         public void setProgress(Double percent) {
             if (!listeners.isEmpty()) {
                 for (ResultListener<T> listener : listeners) {
-                    new Handler(Looper.getMainLooper()).post(() -> listener.onProgress(percent));
+                    uiHandler.post(() -> listener.onProgress(percent));
                 }
             }
         }
@@ -128,9 +129,9 @@ public abstract class Result<T> {
 
 
     public interface IFuture<T> {
-        void addResultListener(ResultListener<T> listener);
+        boolean addResultListener(ResultListener<T> listener);
 
-        void removeResultListener(ResultListener<T> listener);
+        boolean removeResultListener(ResultListener<T> listener);
 
         void clearResultListeners();
 

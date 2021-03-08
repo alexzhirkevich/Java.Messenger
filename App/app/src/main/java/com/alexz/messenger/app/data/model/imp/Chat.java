@@ -52,8 +52,7 @@ public class Chat extends BaseModel implements Parcelable, IChat, Comparable<Cha
             creationTime = in.readLong();
         }
         lastMessage = in.readParcelable(Message.class.getClassLoader());
-        byte tmpIsGroup = in.readByte();
-        isGroup = tmpIsGroup == 0 ? null : tmpIsGroup == 1;
+        isGroup = in.readByte() != 0;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class Chat extends BaseModel implements Parcelable, IChat, Comparable<Cha
             dest.writeLong(creationTime);
         }
         dest.writeParcelable(lastMessage, flags);
-        dest.writeByte((byte) (isGroup == null ? 0 : isGroup ? 1 : 2));
+        dest.writeByte((byte) (isGroup == null ? 0 : isGroup ? 1 : 0));
     }
 
     public static final Creator<Chat> CREATOR = new Creator<Chat>() {

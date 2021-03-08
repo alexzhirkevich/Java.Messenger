@@ -3,6 +3,7 @@ package com.alexz.messenger.app.ui.common.firerecyclerview;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.Pair;
 import android.view.ViewGroup;
 
 import androidx.annotation.CallSuper;
@@ -24,25 +25,24 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH extends FirebaseMapViewHolder<Model>>
-        extends RecyclerView.Adapter<VH>
-        implements IFirebaseMapRecyclerAdapter<Model,VH>, ClickableItemContainer<Model>, Listenable, ObservableLoader {
+public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH extends FirebaseViewHolder<Model>>
+        extends FirebaseDefaultRecyclerAdapter<Model,VH>
+        implements IFirebaseMapRecyclerAdapter<Model,VH>, Listenable {
 
     private static final String TAG = FirebaseMapRecyclerAdapter.class.getSimpleName();
 
-    private final Class<Model> modelClass;
     private Query keysQuery;
 
     private final Map<String, ObservableModelInfo> modelsInfo = new ConcurrentHashMap<>();
-    private final List<Model> models = new CopyOnWriteArrayList<>();
-    private List<Model> selected = models;
 
     private ChildEventListener keysQueryListener;
-    private RecyclerItemClickListener<Model> itemClickListener;
-    private Runnable onStartLoading, onEndLoading;
 
     private boolean listening = false;
+    private boolean loading = false;
     private long chatsCount = -1;
+
+
+
 
     /**
      * Model class for {@link DataSnapshot} parsing
@@ -50,157 +50,36 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
      * @see IBaseModel
      */
     public FirebaseMapRecyclerAdapter(Class<Model> modelClass){
-        this.modelClass = modelClass;
-    }
-
-    /**
-     Makes view clickable and sets click listener
-     Use {@link IFirebaseMapRecyclerAdapter#onCreateClickableViewHolder(ViewGroup, int)} to create ViewHolder
-     */
-    @NonNull
-    @Override
-    public final VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        VH holder = onCreateClickableViewHolder(parent,viewType);
-        holder.itemView.setClickable(true);
-        holder.itemView.setFocusable(true);
-        holder.itemView.setLongClickable(true);
-        holder.itemView.requestLayout();
-        holder.itemView.setOnClickListener(view ->{
-            if (itemClickListener != null){
-                itemClickListener.onItemClick(view,holder.getModel());
-            }
-        });
-        holder.itemView.setOnLongClickListener(view ->{
-            if (itemClickListener!=null){
-                return itemClickListener.onLongItemClick(view,holder.getModel());
-            }
-            return false;
-        });
-        return holder;
+        super(modelClass);
     }
 
 
 
     /**
-     {@link IFirebaseMapViewHolder#bind(IBaseModel)} used to bind a ViewHolder
-     */
+     * @see IFirebaseRecyclerAdapter#parse(DataSnapshot)
+     * */
     @Override
-    public final void onBindViewHolder(@NonNull VH holder, int position) {
-        holder.bind(selected.get(position));
-    }
-
-
-    /**
-     * @return current selected items count
-     *
-     * @see IFirebaseMapRecyclerAdapter#select(String, boolean)
-     * @see IFirebaseMapRecyclerAdapter#selectAll()
-     *
-     */
-    @Override
-    public final int getItemCount() {
-        return selected.size();
+    public Model parse(DataSnapshot snapshot) {
+        return snapshot.getValue(modelClass);
     }
 
 
 
     /**
-     * @see ClickableItemContainer#setOnItemClickListener(RecyclerItemClickListener)
-     * @param listener - {@link RecyclerItemClickListener}
-     */
+     * @see IFirebaseRecyclerAdapter#onSelect(String, IBaseModel)
+     * */
     @Override
-    public final void setOnItemClickListener(RecyclerItemClickListener<Model> listener) {
-        this.itemClickListener = listener;
+    public boolean onSelect(@Nullable String selectionKey, @NonNull Model model) {
+        return true;
     }
 
-
-
+    
+    
     /**
-     * @see ObservableLoader
-     * @param runnable - callback
-     */
+     * @see IFirebaseMapRecyclerAdapter#onModelNotFound(String)
+     * */
     @Override
-    public void setOnStartLoadingListener(Runnable runnable) {
-        this.onStartLoading = runnable;
-    }
-
-
-
-    /**
-     * @see ObservableLoader
-     * @param runnable - callback
-     */
-    @Override
-    public void setOnEndLoadingListener(Runnable runnable) {
-        this.onEndLoading = runnable;
-    }
-
-
-
-    @CallSuper
-    @Override
-    protected void finalize() throws Throwable {
-        stopListening();
-        super.finalize();
-    }
-
-
-
-    /**
-     * Clears all elements.
-     *
-     * <b>[!] Elements can return if adapter is listening</b>
-     * <b>To prevent this, use {@link FirebaseMapRecyclerAdapter#stopListening()} before clearing</b>
-     * @see Listenable
-     */
-    public final void clear(){
-        models.clear();
-        selected.clear();
-        notifyDataSetChanged();
-    }
-
-
-
-    /**
-     * @see IFirebaseMapRecyclerAdapter#select(String, boolean) ()
-     */
-    @Override
-    public final int select(String containsString, boolean ignoreCase) {
-        if (containsString == null){
-            selectAll();
-            return selected.size();
-        }
-        selected = new ArrayList<>();
-        for (Model m : models){
-
-            String selField = onGetFieldForSelection(m);
-
-            if (ignoreCase) {
-                if (selField.toLowerCase().contains(containsString.toLowerCase())) {
-                    selected.add(m);
-                }
-            } else {
-                if (selField.contains(containsString)) {
-                    selected.add(m);
-                }
-            }
-        }
-        notifyDataSetChanged();
-        return selected.size();
-    }
-
-
-
-    /**
-     * @see IFirebaseMapRecyclerAdapter#selectAll()
-     */
-    @Override
-    public final void selectAll() {
-        if (selected != models) {
-            selected = models;
-            notifyDataSetChanged();
-        }
-    }
+    public void onModelNotFound(@NonNull String modelId) { }
 
 
 
@@ -213,14 +92,15 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
             listening = true;
             if (keysQueryListener == null) {
 
-                if (onStartLoading!=null) {
-                    onStartLoading.run();
+                if (loadingCallback!=null) {
+                    uiHandler.post(() -> loadingCallback.onStartLoading());
                 }
+                loading = true;
 
                 keysQueryListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                        observeModel(snapshot.getKey());
+                        observeModel(snapshot.getKey(),false);
                     }
 
                     @Override
@@ -228,12 +108,14 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
                         if (previousChildName != null) {
                             stopObserve(previousChildName);
                         }
-                        observeModel(snapshot.getKey());
+                        observeModel(snapshot.getKey(),true);
                     }
 
                     @Override
                     public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                         stopObserve(snapshot.getKey());
+                        chatsCount--;
+                        checkLoadingEnd();
                     }
 
                     @Override
@@ -284,8 +166,8 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
     @Override
     public final void stopListening() {
         if (listening) {
-            keysQuery.removeEventListener(keysQueryListener);
             listening = false;
+            keysQuery.removeEventListener(keysQueryListener);
             for (String key : modelsInfo.keySet()){
                 ObservableModelInfo info  = modelsInfo.get(key);
                 if (info!=null) {
@@ -295,7 +177,18 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
         }
     }
 
-    private void observeModel(String modelId) {
+
+
+    @CallSuper
+    @Override
+    protected void finalize() throws Throwable {
+        stopListening();
+        super.finalize();
+    }
+
+
+
+    private void observeModel(String modelId,boolean changed) {
         if (modelsInfo.containsKey(modelId) && modelsInfo.get(modelId) != null) {
             Objects.requireNonNull(modelsInfo.get(modelId)).startListening();
         } else {
@@ -304,23 +197,27 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
 
-                        Model newModel = snapshot.getValue(modelClass);
+                        Model newModel = parse(snapshot);
                         if (newModel != null) {
-                            for (Model m : models) {
-                                if (m.getId().equals(newModel.getId())) {
-                                    int i = models.indexOf(m);
-                                    models.set(i, newModel);
-                                    notifyItemChanged(i);
-                                    return;
+                            int idx = add(newModel);
+                            if (!isSearching()) {
+                                if (idx == realItemCount()){
+                                    notifyItemInserted(realItemCount());
+                                } else {
+                                    notifyItemChanged(idx);
                                 }
                             }
-                            models.add(snapshot.getValue(modelClass));
-                            if (models.size() >= chatsCount && onEndLoading != null){
-                                new Handler(Looper.getMainLooper()).post(onEndLoading);
+                            if (adapterCallback != null) {
+                                if (changed) {
+                                    uiHandler.post(() -> adapterCallback.onItemChanged(newModel));
+                                } else {
+                                    uiHandler.post(() -> adapterCallback.onItemAdded(newModel));
+                                }
                             }
-                            notifyItemInserted(models.size());
+                            checkLoadingEnd();
                         }
                     } else {
+                        onModelNotFound(modelId);
                         Log.w(TAG, "Failed to observe model. Id: " + modelId);
                     }
                 }
@@ -339,14 +236,48 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
 
     private void stopObserve(String modelId){
         ObservableModelInfo info = modelsInfo.remove(modelId);
-        if (info != null){
+        if (info != null) {
             info.stopListening();
-            for (Model m : models){
-                if (m.getId().equals(modelId)){
-                    models.remove(m);
+            Pair<Model, Integer> removed = remove(modelId);
+            if (removed != null) {
+                if (adapterCallback != null) {
+                    uiHandler.post(() -> adapterCallback.onItemRemoved(removed.first));
+                }
+                if (!isSearching()) {
+                    notifyItemRemoved(removed.second);
                 }
             }
         }
+    }
+
+    private void checkLoadingEnd(){
+        if (loading && realItemCount() >= chatsCount){
+            loading = false;
+            if (loadingCallback != null) {
+                uiHandler.post(() -> loadingCallback.onEndLoading());
+            }
+        }
+    }
+
+    @Override
+    protected final int add(Model m) {
+        return super.add(m);
+    }
+
+    @Nullable
+    @Override
+    protected final Pair<Model, Integer> remove(String id) {
+        return super.remove(id);
+    }
+
+    @Override
+    protected final void removeAll() {
+        super.removeAll();
+    }
+
+    @Override
+    protected final int realItemCount() {
+        return super.realItemCount();
     }
 
     private class ObservableModelInfo implements Listenable {
@@ -382,5 +313,4 @@ public abstract class FirebaseMapRecyclerAdapter<Model extends IBaseModel, VH ex
             super.finalize();
         }
     }
-
 }

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.Result;
@@ -34,12 +35,12 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
     public static final int REQ_NEW_CHAT_PHOTO = 1701;
 
     private NewChatDialog newChatDialog;
-    private final Activity activity;
+    private final Fragment fragment;
 
-    public AddChatDialog(Activity activity) {
-        super(activity);
-        this.activity = activity;
-        LinearLayout layout = new LinearLayout(activity);
+    public AddChatDialog(Fragment fragment) {
+        super(fragment.getContext());
+        this.fragment = fragment;
+        LinearLayout layout = new LinearLayout(fragment.getContext());
         getLayoutInflater().inflate(R.layout.dialog_add_chat, layout);
         setView(layout);
         final Button btnNew = layout.findViewById(R.id.btn_new_chat);
@@ -56,10 +57,11 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
     public void onClick(View view) {
         if (view.getId() == R.id.btn_new_chat){
             onBackPressed();
-            newChatDialog = new NewChatDialog(activity);
+            newChatDialog = new NewChatDialog(fragment);
             newChatDialog.show();
         } else if (view.getId() == R.id.btn_find_chat){
             new FindChatDialog(getContext()).show();
+            onBackPressed();
         }
     }
 
@@ -97,8 +99,18 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
         public void onClick(View view) {
             if (editId!=null){
                 String id = editId.getText().toString().trim();
+                DialogsRepository.findChat(id).addResultListener(new Result.ResultListener<Chat>() {
+                    @Override
+                    public void onSuccess(@NonNull Result.ISuccess<Chat> result) {
+                        ChatActivity.startActivity(getContext(),result.get());
+                    }
+
+                    @Override
+                    public void onError(@Nullable Result.IError error) {
+                        Toast.makeText(getContext(),error.getError(),Toast.LENGTH_SHORT).show();
+                    }
+                });
                 onBackPressed();
-                DialogsRepository.findChat(id, getContext());
             }
         }
 
@@ -133,15 +145,15 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
         private final Button btnOk;
         private final ProgressBar photoUpload;
 
-        private final Activity activity;
+        private final Fragment fragment;
 
         private Uri imageUri;
         private StorageReference storageReference;
         private boolean deletePhoto = false;
 
-        public NewChatDialog(Activity activity) {
-            super(activity);
-            this.activity = activity;
+        public NewChatDialog(Fragment fragment) {
+            super(fragment.getContext());
+            this.fragment = fragment;
             LinearLayout layout = new LinearLayout(getContext());
             getLayoutInflater().inflate(R.layout.dialog_new_chat, layout);
             setView(layout);
@@ -180,7 +192,7 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
                 if (!name.isEmpty()) {
                     deletePhoto = false;
                     onBackPressed();
-                    Chat c = new Chat(imageUri.toString(), name, true);
+                    Chat c = new Chat(imageUri!=null?imageUri.toString():null, name, true);
                     DialogsRepository.createChat(c);
                     ChatActivity.startActivity(getContext(), c);
 
@@ -189,10 +201,10 @@ public class AddChatDialog extends AlertDialog implements View.OnClickListener, 
                 }
             } else if (view.getId() == R.id.btn_create_photo){
                 if (!deletePhoto) {
-                    if (activity != null) {
+                    if (fragment != null) {
                         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                         photoPickerIntent.setType("image/*");
-                        activity.startActivityForResult(photoPickerIntent, REQ_NEW_CHAT_PHOTO);
+                        fragment.startActivityForResult(photoPickerIntent, REQ_NEW_CHAT_PHOTO);
                     }
                 } else {
                     storageReference.delete();

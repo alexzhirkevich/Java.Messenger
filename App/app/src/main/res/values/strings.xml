@@ -89,8 +89,6 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
-
-
-
+    <string name="transition_image_fullscreen" translatable="false">transition_message_image</string>>
 </resources>
 

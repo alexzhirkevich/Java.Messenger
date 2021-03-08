@@ -2,48 +2,30 @@ package com.alexz.messenger.app.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.alexz.messenger.app.data.model.imp.Chat;
-import com.alexz.messenger.app.ui.chats.ChatRecyclerAdapter;
 import com.alexz.messenger.app.ui.chats.ChatsViewPagerAdapter;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
-import com.alexz.messenger.app.ui.dialogwindows.AddChatDialog;
-import com.alexz.messenger.app.ui.viewmodels.DialogsActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.alexz.messenger.app.util.KeyboardUtil;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.messenger.app.R;
 
 public class DialogsActivity extends BaseActivity
@@ -70,6 +52,11 @@ public class DialogsActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -167,14 +154,6 @@ public class DialogsActivity extends BaseActivity
             toolbar.setNavigationIcon(R.drawable.ic_menu);
             setSupportActionBar(toolbar);
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == AddChatDialog.REQ_NEW_CHAT_PHOTO && addChatDialog != null){
-//            addChatDialog.onDialogResult(requestCode,resultCode,data);
-//        }
     }
 
     private void setupTabLayout() {

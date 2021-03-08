@@ -194,6 +194,7 @@ public class NewMessageService extends Service {
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                     if (BuildConfig.DEBUG) {
                         Log.w(TAG, "[!] Failed to load chat bitmap for notification. Notified without image");
+                        Log.e(TAG, e.getMessage());
                     }
                     notificationUtil.execute(0);
                     return true;

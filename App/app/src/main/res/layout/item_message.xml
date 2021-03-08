@@ -6,7 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/chat_message_space">
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginTop="@dimen/chat_message_space">
 
     <com.alexz.messenger.app.ui.common.AvatarImageView
         android:id="@+id/message_avatar"
@@ -35,8 +36,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:background="@android:color/transparent"
-            android:paddingStart="10dp"
-            android:paddingEnd="15dp"
+            android:paddingHorizontal="@dimen/message_content_padding"
             android:clickable="true"
             android:focusable="true"
             android:longClickable="true"
@@ -51,8 +51,8 @@
             android:layout_below="@+id/message_sender"
             android:background="@android:color/transparent"
             android:layout_alignParentStart="true"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
+            android:paddingHorizontal="@dimen/message_content_padding"
+            android:layout_marginBottom="@dimen/message_text_vertical_margin"
             android:autoLink="web|phone|email"
             android:linksClickable="true"
             android:text="Text"
@@ -61,37 +61,39 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             app:shapeAppearanceOverlay="@style/roundedImageView"
+            android:transitionName="@string/transition_image_fullscreen"
             android:id="@+id/message_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/message_text"
             android:background="@android:color/transparent"
             android:layout_alignParentStart="true"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="1dp"
+            android:layout_marginVertical="1dp"
             android:clickable="true"
             android:focusable="true"
             android:longClickable="true"
             android:scaleType="centerCrop"
             android:src="@drawable/logo256"/>
 
-        <TextView
-            android:id="@+id/message_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/message_image"
-            android:layout_marginBottom="5dp"
-            android:layout_alignParentStart="true"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:background="@android:color/transparent"
-            android:inputType="time"
-            android:maxLines="1"
-            android:text="13:37"
-            android:textColor="@color/gray"
-            android:textSize="@dimen/message_date_size" />
-
     </RelativeLayout>
+    <TextView
+        android:id="@+id/message_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/message_data_layout"
+        android:layout_marginBottom="5dp"
+        android:layout_alignStart="@id/message_data_layout"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:gravity="bottom"
+        android:background="@android:color/transparent"
+        android:inputType="time"
+        android:maxLines="1"
+        android:text="13:37"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/message_date_size" />
+
 
 
 </RelativeLayout>

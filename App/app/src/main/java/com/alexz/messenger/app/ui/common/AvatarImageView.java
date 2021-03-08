@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.AppCompatImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -22,7 +23,7 @@ import com.bumptech.glide.request.target.Target;
 import com.messenger.app.BuildConfig;
 import com.messenger.app.R;
 
-public class AvatarImageView extends androidx.appcompat.widget.AppCompatImageView {
+public class AvatarImageView extends AppCompatImageView {
 
     private Drawable circle;
     private String imageUri;

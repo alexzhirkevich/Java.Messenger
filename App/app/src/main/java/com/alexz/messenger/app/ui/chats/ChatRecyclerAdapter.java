@@ -1,26 +1,34 @@
 package com.alexz.messenger.app.ui.chats;
 
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.repo.DialogsRepository;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
 import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseMapRecyclerAdapter;
-import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseMapViewHolder;
+import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseViewHolder;
 import com.alexz.messenger.app.util.DateUtil;
 import com.alexz.messenger.app.util.FirebaseUtil;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.messenger.app.BuildConfig;
 import com.messenger.app.R;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
 public class ChatRecyclerAdapter extends FirebaseMapRecyclerAdapter<Chat, ChatRecyclerAdapter.ChatViewHolder> {
+
+    static final String TAG = ChatRecyclerAdapter.class.getSimpleName();
 
     public ChatRecyclerAdapter(){
         super(Chat.class);
@@ -34,14 +42,29 @@ public class ChatRecyclerAdapter extends FirebaseMapRecyclerAdapter<Chat, ChatRe
 
     @NonNull
     @Override
-    public String onGetFieldForSelection(Chat model) {
-        return model.getName();
+    public Query onCreateModelQuery(@NotNull String modelId) {
+        return DialogsRepository.getChat(modelId);
     }
 
-    @NonNull
     @Override
-    public Query onCreateModelQuery(String modelId) {
-        return DialogsRepository.getChat(modelId);
+    public void onModelNotFound(@NotNull String modelId) {
+        FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseUtil.USERS)
+                .child(FirebaseUtil.getCurrentUser().getId())
+                .child(FirebaseUtil.CHATS)
+                .child(modelId)
+                .removeValue();
+        if (BuildConfig.DEBUG){
+            Log.d(TAG, "Invalid chat removed: " + modelId);
+        }
+    }
+
+    @Override
+    public boolean onSelect(@Nullable String selectionKey, @NonNull Chat model) {
+        if (selectionKey == null){
+            return true;
+        }
+        return model.getName().toLowerCase().contains(selectionKey.toLowerCase());
     }
 
     @NonNull
@@ -52,7 +75,7 @@ public class ChatRecyclerAdapter extends FirebaseMapRecyclerAdapter<Chat, ChatRe
         return new ChatViewHolder(root);
     }
 
-    static class ChatViewHolder extends FirebaseMapViewHolder<Chat>{
+    static class ChatViewHolder extends FirebaseViewHolder<Chat> {
 
         private final AvatarImageView image;
         private final TextView name;

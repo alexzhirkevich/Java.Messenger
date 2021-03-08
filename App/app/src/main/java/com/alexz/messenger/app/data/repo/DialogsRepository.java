@@ -6,9 +6,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.alexz.messenger.app.data.model.Result;
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.ui.activities.ChatActivity;
 import com.alexz.messenger.app.util.FirebaseUtil;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,21 +26,19 @@ public class DialogsRepository {
     public static void createChat(Chat d){
         String userId = FirebaseUtil.getCurrentUser().getId();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
+        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.CHATS)
                 .push();
-        d.setId(userId + ":" + ref.getKey());
+        d.setId(userId + ":" + chatRef.getKey());
         d.setCreatorId(userId);
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseUtil.CHATS)
-                .child(d.getId())
-                .child(FirebaseUtil.INFO).setValue(d);
 
-        FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseUtil.CHATS)
-                .child(d.getId())
-                .child(FirebaseUtil.USERS)
+        chatRef = chatRef.getParent().child(d.getId());
+
+        chatRef.child(FirebaseUtil.INFO).setValue(d);
+
+        chatRef.child(FirebaseUtil.USERS)
                 .child(userId).setValue("");
+
         FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.USERS)
                 .child(d.getCreatorId())
@@ -45,45 +47,31 @@ public class DialogsRepository {
                 .setValue("");
     }
 
-    public static void findChat(String chatId, Context openContext) {
-
+    public static Result.Future<Chat> findChat(String chatId) {
+        Result.MutableFuture<Chat> future = new Result.MutableFuture<>();
         String id = FirebaseUtil.getCurrentUser().getId();
-
-        FirebaseDatabase.getInstance().getReference()
+        DatabaseReference addRef = FirebaseDatabase.getInstance().getReference()
                 .child(FirebaseUtil.USERS)
                 .child(id)
                 .child(FirebaseUtil.CHATS)
-                .child(chatId)
-                .setValue("")
-                .addOnSuccessListener(aVoid ->
-                        FirebaseDatabase.getInstance().getReference()
-                                .child(FirebaseUtil.CHATS)
-                                .child(chatId).child(FirebaseUtil.INFO).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child(FirebaseUtil.CHATS)
-                                    .child(chatId).child(FirebaseUtil.USERS).child(id).setValue("");
-                            //ChatActivity.startActivity(openContext,getChat);
-                            if (BuildConfig.DEBUG) {
-                                Log.e("FIND CHAT", "SUCCESS: Chat added");
-                            }
-                        } else {
-                            if (BuildConfig.DEBUG) {
-                                Toast.makeText(openContext, R.string.error_chat_not_found,Toast.LENGTH_LONG).show();
-                                Log.e("FIND CHAT", "ERROR: Incorrect chat id");
-                            }
-                        }
-                    }
+                .child(chatId);
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+        addRef.setValue("")
+        .addOnSuccessListener(aVoid -> getChat(chatId).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        future.set(new Result.Success<Chat>(snapshot.getValue(Chat.class)));
                         if (BuildConfig.DEBUG) {
-                            Log.e("FIND CHAT", "ERROR: Unknown");
+                            Log.e("FIND CHAT", "SUCCESS: Chat added");
                         }
+                    } else {
+                        onChatFindFailure(addRef,future);
                     }
-                }));
+                })
+                .addOnFailureListener(e -> onChatFindFailure(addRef,future))
+                .addOnCanceledListener(() -> onChatFindFailure(addRef,future)));
+
+        return future;
     }
 
     public static void removeEmptyChatId(String chatId){
@@ -120,6 +108,14 @@ public class DialogsRepository {
                     child(userId).
                     child(FirebaseUtil.CHATS).
                     child(chat.getId()).setValue(null);
+        }
+    }
+
+    private static void onChatFindFailure(DatabaseReference addRef, Result.MutableFuture<Chat> future){
+        addRef.removeValue();
+        future.set(new Result.Error(R.string.error_chat_not_found));
+        if (BuildConfig.DEBUG) {
+            Log.e("FIND CHAT", "FAILURE: Chat added");
         }
     }
 }

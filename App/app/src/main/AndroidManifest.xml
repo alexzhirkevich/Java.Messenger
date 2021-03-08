@@ -14,6 +14,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_logo_round"
         android:supportsRtl="true"
+        android:largeHeap="true"
+        android:hardwareAccelerated="false"
         android:theme="@style/Theme.App">
         <activity android:name="com.alexz.messenger.app.ui.activities.UserListActivity"
             android:theme="@style/Theme.App.NoActionBar"/>

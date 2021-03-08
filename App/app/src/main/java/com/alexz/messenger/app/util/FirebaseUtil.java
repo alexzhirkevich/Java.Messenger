@@ -10,6 +10,7 @@ import com.alexz.messenger.app.data.model.imp.User;
 import com.alexz.messenger.app.data.repo.MessagesRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -41,21 +42,14 @@ public class FirebaseUtil {
 
     public static void setOnline(boolean online) {
         if (FirebaseAuth.getInstance().getUid() != null) {
-            User u = FirebaseUtil.getCurrentUser();
-            FirebaseDatabase.getInstance().getReference()
+            DatabaseReference userInfoRef = FirebaseDatabase.getInstance().getReference()
                     .child(FirebaseUtil.USERS)
-                    .child(u.getId())
-                    .child(FirebaseUtil.INFO)
-                    .child(FirebaseUtil.ONLINE)
-                    .setValue(online);
-            if (!online) {
-                FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseUtil.USERS)
-                        .child(u.getId())
-                        .child(FirebaseUtil.INFO)
-                        .child(FirebaseUtil.LASTONLINE)
-                        .setValue(new Date().getTime());
+                    .child(FirebaseUtil.getCurrentUser().getId())
+                    .child(FirebaseUtil.INFO);
 
+            userInfoRef.child(FirebaseUtil.ONLINE).setValue(online);
+            if (!online) {
+                userInfoRef.child(FirebaseUtil.LASTONLINE).setValue(new Date().getTime());
             }
         }
     }
@@ -86,18 +80,15 @@ public class FirebaseUtil {
 
         StorageReference ref = FirebaseStorage.getInstance().getReference()
                 .child(FirebaseUtil.getCurrentUser().getId())
-                .child(String.valueOf(System.currentTimeMillis()) + "." + ext);
+                .child(System.currentTimeMillis() + "." + ext);
         ref.putFile(path)
                 .addOnSuccessListener(taskSnapshot ->
                         taskSnapshot.getMetadata().getReference().getDownloadUrl()
-                                .addOnSuccessListener(task ->
-                                        res.set(new Result.Success<>(new Pair<>(task,ref))))
-                                .addOnFailureListener(e ->
-                                        res.set(new Result.Error(R.string.error_upload_file))))
-                .addOnFailureListener(e ->
-                        res.set(new Result.Error(R.string.error_upload_file)))
-                .addOnProgressListener(snapshot ->
-                        res.setProgress(100.0 *((UploadTask.TaskSnapshot)snapshot).getBytesTransferred() /((UploadTask.TaskSnapshot)snapshot).getTotalByteCount()));
+                                .addOnSuccessListener(task -> res.set(new Result.Success<>(new Pair<>(task,ref))))
+                                .addOnFailureListener(e -> res.set(new Result.Error(R.string.error_upload_file))))
+                .addOnFailureListener(e -> res.set(new Result.Error(R.string.error_upload_file)))
+                .addOnProgressListener(snapshot -> res.setProgress(100.0 * ((UploadTask.TaskSnapshot)snapshot).getBytesTransferred() / ((UploadTask.TaskSnapshot)snapshot).getTotalByteCount()));
+
         return res;
     }
 }

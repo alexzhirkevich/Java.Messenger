@@ -1,55 +1,47 @@
 package com.alexz.messenger.app.ui.activities;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ContentProvider;
-import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContentProviderCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alexz.messenger.app.data.model.Result;
 import com.alexz.messenger.app.data.model.imp.Chat;
 import com.alexz.messenger.app.data.model.imp.Message;
-import com.alexz.messenger.app.data.model.Result;
+import com.alexz.messenger.app.ui.common.AvatarImageView;
+import com.alexz.messenger.app.ui.common.ItemClickListener;
+import com.alexz.messenger.app.ui.messages.MessageFirebaseRecyclerAdapter;
+import com.alexz.messenger.app.ui.messages.MessageInput;
 import com.alexz.messenger.app.ui.viewmodels.ChatActivityViewModel;
 import com.alexz.messenger.app.util.FirebaseUtil;
 import com.google.firebase.storage.StorageReference;
 import com.messenger.app.R;
-import com.alexz.messenger.app.ui.common.AvatarImageView;
-import com.alexz.messenger.app.ui.common.firerecyclerview.RecyclerItemClickListener;
-import com.alexz.messenger.app.ui.messages.MessageInput;
-import com.alexz.messenger.app.ui.messages.MessageFirebaseRecyclerAdapter;
 
-public class    ChatActivity extends BaseActivity
-    implements MessageInput.OnSendListener, MessageInput.OnAttachListener, PopupMenu.OnMenuItemClickListener {
+public class ChatActivity extends BaseActivity
+    implements MessageInput.OnSendListener,
+        MessageInput.OnAttachListener,
+        PopupMenu.OnMenuItemClickListener{
 
     private static final String EXTRA_CHAT = "EXTRA_CHAT";
     private static final int PERM_STORAGE = 2001;
@@ -83,33 +75,32 @@ public class    ChatActivity extends BaseActivity
         chat = getIntent().getParcelableExtra(EXTRA_CHAT);
         viewModel = new ViewModelProvider(this).get(ChatActivityViewModel.class);
         viewModel.setChatId(chat.getId());
-        viewModel.getChatInfoChangedLiveData().observe(this, chat -> setupChatInfo(chat.getId(),chat.getName(),chat.getImageUri()));
+        viewModel.getChatInfoChangedLiveData().observe(this,
+                chat -> setupChatInfo(chat.getId(),chat.getName(),chat.getImageUri()));
         setupChatInfo(chat.getId(),chat.getName(),chat.getImageUri());
 
         setupRecyclerView();
         setupInput();
         setupToolbar();
-        mRecyclerView.postDelayed(() -> mRecyclerView.smoothScrollToPosition(mRecyclerView.getBottom()),200);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         adapter.startListening();
         viewModel.startListening();
+        mRecyclerView.postDelayed(
+                () -> mRecyclerView.smoothScrollToPosition(mRecyclerView.getBottom()),200);
+
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
-        viewModel.stopListening();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_chat, menu);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        adapter.stopListening();
+        viewModel.stopListening();
     }
 
     @Override
@@ -233,8 +224,8 @@ public class    ChatActivity extends BaseActivity
         }
     }
 
-    private RecyclerItemClickListener<Message> newItemClickListener() {
-        return new RecyclerItemClickListener<Message>() {
+    private ItemClickListener<Message> newItemClickListener() {
+        return new ItemClickListener<Message>() {
             @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onLongItemClick(View view, Message message) {
@@ -287,6 +278,8 @@ public class    ChatActivity extends BaseActivity
             attach.setColorFilter(null);
             attach.setEnabled(true);
         } else{
+            restoreAttachButton();
+            uploadedImage = null;
         }
     }
 
@@ -298,16 +291,17 @@ public class    ChatActivity extends BaseActivity
         adapter = viewModel.getAdapter();
         mRecyclerView.setAdapter(adapter);
         adapter.setOnItemClickListener(newItemClickListener());
-        adapter.setImageClickListener(new RecyclerItemClickListener<Message>() {
+        adapter.setImageClickListener(new ItemClickListener<Message>() {
             @Override
             public void onItemClick(View view, Message data) {
-                FullscreenImageActivity.startActivity(ChatActivity.this, data.getImageUrl());
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        ChatActivity.this,view,getString(R.string.transition_image_fullscreen));
+                FullscreenImageActivity.startActivity(ChatActivity.this, data.getImageUrl(),options.toBundle());
             }
 
             @Override
             public boolean onLongItemClick(View view, Message data) {
-                //return newItemClickListener().onLongItemClick(mRecyclerView.getChildAt(adapter.geti);
-                return true;
+                return adapter.getOnItemClickListener().onLongItemClick(view,data);
             }
         });
     }

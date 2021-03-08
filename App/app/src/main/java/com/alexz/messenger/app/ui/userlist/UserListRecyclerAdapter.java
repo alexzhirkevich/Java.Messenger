@@ -12,10 +12,12 @@ import com.alexz.messenger.app.data.model.imp.User;
 import com.alexz.messenger.app.data.repo.UserListRepository;
 import com.alexz.messenger.app.ui.common.AvatarImageView;
 import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseMapRecyclerAdapter;
-import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseMapViewHolder;
+import com.alexz.messenger.app.ui.common.firerecyclerview.FirebaseViewHolder;
 import com.alexz.messenger.app.util.DateUtil;
 import com.google.firebase.database.Query;
 import com.messenger.app.R;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
@@ -36,7 +38,7 @@ public class UserListRecyclerAdapter extends FirebaseMapRecyclerAdapter<User, Us
 
     @NonNull
     @Override
-    public Query onCreateModelQuery(String modelId) {
+    public Query onCreateModelQuery(@NotNull String modelId) {
         return UserListRepository.getUser(modelId);
     }
 
@@ -47,7 +49,7 @@ public class UserListRecyclerAdapter extends FirebaseMapRecyclerAdapter<User, Us
         return new UserViewHolder(view);
     }
 
-    static class UserViewHolder extends FirebaseMapViewHolder<User> {
+    static class UserViewHolder extends FirebaseViewHolder<User> {
 
         private final AvatarImageView avatar;
         private final TextView name;
